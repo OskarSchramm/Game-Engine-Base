@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\x64\Debug\CapNCrunchEngineSCHOOL.exe</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles>
+    <ContentFile>
+      <FullPath>E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\x64\Debug\ColorPS.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\x64\Debug\ColorVS.cso</FullPath>
+    </ContentFile>
+  </ContentFiles>
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

@@ -1,0 +1,29 @@
+﻿  GraphicsEngine.cpp
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(141,76): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(200,41): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(201,42): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(206,19): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(207,20): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(290,29): warning C4244: '=': conversion from 'float' to 'UINT', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(311,30): warning C4244: 'argument': conversion from 'float' to 'const unsigned __int64', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(317,37): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(325,26): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(346,94): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(304,7): warning C4101: 'result': unreferenced local variable
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(422,21): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(423,22): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(424,18): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(425,19): warning C4244: 'initializing': conversion from 'float' to 'size_t', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(427,35): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(429,32): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(431,33): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(433,33): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(435,36): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(437,35): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(452,51): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\GraphicsEngine.cpp(520,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  CapNCrunchEngineSCHOOL.vcxproj -> E:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\x64\Debug\CapNCrunchEngineSCHOOL.exe
