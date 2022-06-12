@@ -139,7 +139,6 @@ float3 EvaluateAmbiance(TextureCube lysBurleyCube, float3 vN, float3 VNUnit, flo
 
     float3 ambientdiffuse = ao * dfcol * diffRad;
     float3 ambientspecular = fFade * spccol * specRad;
-
     return ambientdiffuse + ambientspecular;
 }
 
@@ -157,7 +156,6 @@ float3 EvaluateDirectionalLight(float3 albedoColor, float3 specularColor, float3
 
     float3 cDiff = Diffuse(albedoColor);
     float3 cSpec = Specular(specularColor, h, viewDir, a, NdL, NdV, NdH);
-
     return saturate(lightColor * lambert * (cDiff * (1.0 - cSpec) + cSpec) * PI);
 }
 

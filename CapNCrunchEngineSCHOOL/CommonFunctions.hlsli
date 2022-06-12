@@ -15,6 +15,18 @@ float3 expandNormal(float4 normalTexture)
     return normalize(normal);
 }
 
+float3 normal_blend_unity(float4 n1, float4 n2, float aValue)
+{
+    float scalar = aValue * 4;
+    n1 = n1.xyzz * float4(scalar, scalar, scalar, -scalar) + float4(-1, -1, -1, 1);
+    n2 = n2 * scalar - 1;
+    float3 r;
+    r.x = dot(n1.zxx, n2.xyz);
+    r.y = dot(n1.yzy, n2.xyz);
+    r.z = dot(n1.xyw,-n2.xyz);
+    return normalize(r);
+}
+
 // Origin: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
 float3 s_curve(float3 x)
 {

@@ -42,7 +42,6 @@ void Camera::Update(const float aDT)
 	CU::Vector3f nextPos = {};
 	CU::Vector3f nextRot = {};
 
-
 	if (GetAsyncKeyState('W'))
 		nextPos.z += myMoveSpeed * aDT;
 	if (GetAsyncKeyState('A'))
@@ -51,6 +50,11 @@ void Camera::Update(const float aDT)
 		nextPos.z -= myMoveSpeed * aDT;
 	if (GetAsyncKeyState('D'))
 		nextPos.x += myMoveSpeed * aDT;
+
+	if (GetAsyncKeyState(VK_SPACE))
+		nextPos.y += myMoveSpeed * aDT;
+	if (GetAsyncKeyState(VK_CONTROL))
+		nextPos.y -= myMoveSpeed * aDT;
 
 	if (GetAsyncKeyState('Q'))
 		nextRot.y -= myRotationSpeed * aDT;
