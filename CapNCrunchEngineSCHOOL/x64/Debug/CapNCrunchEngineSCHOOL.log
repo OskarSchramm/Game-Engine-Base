@@ -1,6 +1,0 @@
-﻿D:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\ColorPS.hlsl(29,12-71): warning X3206: implicit truncation of vector type
-D:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\ColorPS.hlsl(30,12-70): warning X3206: implicit truncation of vector type
-D:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\CapNCrunchEngineSCHOOL\ColorPS.hlsl(31,12-70): warning X3206: implicit truncation of vector type
-  
-  compilation object save succeeded; see D:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\x64\Debug\ColorPS.cso
-  CapNCrunchEngineSCHOOL.vcxproj -> D:\TGA\Programmering\Kurs6 - Tillampad Grafikprogrammering\ENGINE\CapNCrunchEngineSCHOOL\x64\Debug\CapNCrunchEngineSCHOOL.exe
