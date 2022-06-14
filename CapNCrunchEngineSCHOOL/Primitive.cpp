@@ -10,11 +10,16 @@ Primitive::Primitive(ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext)
 	: myDevicePtr(aDevice), myDeviceContextPtr(aDeviceContext), 
 	myVertexBuffer(nullptr), myIndexBuffer(nullptr), myVertexShader(nullptr), myPixelShader(nullptr),
 	myInputLayout(nullptr), myIndexCount(0), myModelMatrix({})
-{}
+{
+	myTexture = new Texture();
+}
 
 Primitive::~Primitive()
 {
 	Shutdown();
+
+	delete myTexture;
+	myTexture = nullptr;
 }
 
 void Primitive::SetPosition(const CU::Vector3f& aPosition)
@@ -22,7 +27,7 @@ void Primitive::SetPosition(const CU::Vector3f& aPosition)
 	myModelMatrix.SetPositionRelative(aPosition);
 }
 
-bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount)
+bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount, const wchar_t* aTextureFileName)
 {
 	myIndexCount = aIndexCount;
 
@@ -47,6 +52,10 @@ bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aI
 	indexDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;;
 	res = myDevicePtr->CreateBuffer(&indexDesc, &myIndexData, &myIndexBuffer);
 	if (FAILED(res))
+		return false;
+
+	//ADDED
+	if (!myTexture->Init(myDevicePtr, aTextureFileName))
 		return false;
 
 	return true;
@@ -77,6 +86,7 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}, 
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -126,6 +136,8 @@ void Primitive::SetIAStuff()
 
 void Primitive::Render()
 {
+	myTexture->Bind(myDeviceContextPtr, 0);
+
 	UINT strides = sizeof(Vertex);
 	UINT offset = 0;
 
@@ -193,4 +205,7 @@ void Primitive::Shutdown()
 		myInputLayout->Release();
 		myInputLayout = nullptr;
 	}
+
+	if (myTexture)
+		myTexture->Release();
 }

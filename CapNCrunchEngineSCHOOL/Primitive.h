@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <minwindef.h>
 #include "CU/Matrix4x4.hpp"
+#include "Texture.h"
 
 struct Vertex;
 
@@ -19,7 +20,7 @@ public:
 	Primitive(ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext);
 	~Primitive();
 
-	bool Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount);
+	bool Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount, const wchar_t* aTextureFileName);
 	void Render();
 
 	void SetPosition(const CU::Vector3f& aPos);
@@ -41,6 +42,8 @@ private:
 	ID3D11VertexShader* myVertexShader;
 	ID3D11PixelShader* myPixelShader;
 	ID3D11InputLayout* myInputLayout;
+
+	Texture* myTexture;
 
 	CU::Matrix4x4f myModelMatrix;
 };

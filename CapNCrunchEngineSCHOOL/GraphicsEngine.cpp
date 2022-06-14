@@ -7,17 +7,6 @@
 #include "Primitive.h"
 #include "Vertex.h"
 
-namespace CU
-{
-	template<class T>
-	inline Matrix4x4<T> operator*(const Matrix4x4<T>& aLhs, const Matrix4x4<T>& aRhs)
-	{
-		Matrix4x4<T> m;
-		for (size_t row = 0; row < 4; ++row)
-			m.myRows[row] = aLhs.myRows[row] * aRhs;
-		return m;
-	}
-}
 
 GraphicsEngine::GraphicsEngine() = default;
 GraphicsEngine::~GraphicsEngine() = default;
@@ -105,9 +94,6 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 	myContext->OMSetRenderTargets(1, myRenderTarget.GetAddressOf(), myDepthStencilView.Get());
 	myContext->OMSetDepthStencilState(depthStencilState, 0);
 
-	//Camera
-	myCamera.Init(CU::Vector3f{ 0.0f, 0.0f, -10.0f }, CU::Vector3f::Zero, 90.0f, CU::Vector2f{ width, height }, 0.01f, 1000.0f);
-
 	//Create ConstantBuffers - objectbuffer
 	D3D11_BUFFER_DESC bufferDesc = {};
 	bufferDesc.ByteWidth = sizeof(ObjectBuffer);
@@ -124,49 +110,89 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 	if (FAILED(result))
 		return false;
 
-	//ADDED
+	//Create sample state
+	D3D11_SAMPLER_DESC sampleDesc = {};
+	sampleDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampleDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampleDesc.MipLODBias = 0.0f;
+	sampleDesc.MaxAnisotropy = 1.0f;
+	sampleDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	sampleDesc.MinLOD = 0.0f;
+	sampleDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	result = myDevice->CreateSamplerState(&sampleDesc, &mySampleState);
+	if (FAILED(result))
+		return false;
+
+	//Camera
+	myCamera.Init(CU::Vector3f{ 0.0f, 0.0f, -10.0f }, CU::Vector3f::Zero, 90.0f, CU::Vector2f{ width, height }, 0.01f, 1000.0f);
+
 	myCube = new Primitive(myDevice.Get(), myContext.Get());
 	{
 		Vertex vertices[]
 		{
-			{-0.5f,-0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{ 0.5f,-0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{ 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{-0.5f,-0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{ 0.5f,-0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{ 0.5f, 0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{-0.5f, 0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{0.5f, -0.5f, 0.5f, 1, 1, 1, 1, 1, 0, 1},
+			{0.5f, 0.5f, 0.5f, 1, 1, 1, 1, 1, 0, 0},
+			{-0.5f, 0.5f, 0.5f, 1, 1, 1, 1, 1, 1, 0},
+			{-0.5f, -0.5f, 0.5f, 1, 1, 1, 1, 1, 1, 1},
+			{-0.5f, -0.5f, 0.5f, 1, 1, 0, 0, 1, 0, 1},
+			{-0.5f, 0.5f, 0.5f, 1, 1, 0, 0, 1, 0, 0},
+			{-0.5f, 0.5f, -0.5f, 1, 1, 0, 0, 1, 1, 0},
+			{-0.5f, -0.5f, -0.5f, 1, 1, 0, 0, 1, 1, 1},
+			{-0.5f, -0.5f, -0.5f, 1, 0, 1, 0, 1, 0, 1},
+			{-0.5f, 0.5f, -0.5f, 1, 0, 1, 0, 1, 0, 0},
+			{0.5f, 0.5f, -0.5f, 1, 0, 1, 0, 1, 1, 0},
+			{0.5f, -0.5f, -0.5f, 1, 0, 1, 0, 1, 1, 1},
+			{0.5f, -0.5f, -0.5f, 1, 0, 0, 1, 1, 0, 1},
+			{0.5f, 0.5f, -0.5f, 1, 0, 0, 1, 1, 0, 0},
+			{0.5f, 0.5f, 0.5f, 1, 0, 0, 1, 1, 1, 0},
+			{0.5f, -0.5f, 0.5f, 1, 0, 0, 1, 1, 1, 1},
+			{0.5f, 0.5f, 0.5f, 1, 1, 1, 0, 1, 0, 1},
+			{0.5f, 0.5f, -0.5f, 1, 1, 1, 0, 1, 0, 0},
+			{-0.5f, 0.5f, -0.5f, 1, 1, 1, 0, 1, 1, 0},
+			{-0.5f, 0.5f, 0.5f, 1, 1, 1, 0, 1, 1, 1},
+			{-0.5f, -0.5f, 0.5f, 1, 1, 0, 1, 1, 0, 1},
+			{-0.5f, -0.5f, -0.5f, 1, 1, 0, 1, 1, 0, 0},
+			{0.5f, -0.5f, -0.5f, 1, 1, 0, 1, 1, 1, 0},
+			{0.5f, -0.5f, 0.5f, 1, 1, 0, 1, 1, 1, 1},
 		};
 
 		UINT indices[]
 		{
-			0, 3, 2, 2, 1, 0,
-			1, 2, 6, 6, 5, 1,
-			5, 6, 7, 7, 4, 5,
-			4, 7, 3, 3, 0, 4,
-			4, 0, 1, 1, 5, 4,
-			3, 7, 6, 6, 2, 3
+			0, 1, 2,
+			0, 2, 3,
+			4, 5, 6,
+			4, 6, 7,
+			8, 9, 10,
+			8, 10, 11,
+			12, 13, 14,
+			12, 14, 15,
+			16, 17, 18,
+			16, 18, 19,
+			20, 21, 22,
+			20, 22, 23
 		};
 
-		myCube->Init(vertices, std::size(vertices), indices, std::size(indices));
+		myCube->Init(vertices, std::size(vertices), indices, std::size(indices), L"memes.dds");
 		myCube->SetPosition({0.0f, 0.0f, 0.0f});
 		myCube->SetVertexShader(L"ColorVS");
 		myCube->SetPixelShader(L"ColorPS");
 	}
 
-	//ADDED
 	myPyramid = new Primitive(myDevice.Get(), myContext.Get());
 	{
 		Vertex vertices[]
 		{
 			//Base
-			{ -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f },
-			{  0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-			{ -0.5f, -0.5f,-0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f },
-			{  0.5f, -0.5f,-0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f },
+			{ -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+			{  0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f  },
+			{ -0.5f, -0.5f,-0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f  },
+			{  0.5f, -0.5f,-0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f  },
+
 			// top
-			{ 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f},
+			{ 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.5f },
 		};
 
 		UINT indices[]
@@ -181,7 +207,7 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 			3, 4, 1,
 		};
 
-		myPyramid->Init(vertices, std::size(vertices), indices, std::size(indices));
+		myPyramid->Init(vertices, std::size(vertices), indices, std::size(indices), L"memes.dds");
 		myPyramid->SetPosition({ 0.0f, 0.0f, 5.0f });
 		myPyramid->SetVertexShader(L"ColorVS");
 		myPyramid->SetPixelShader(L"CoolsinwavePS");
@@ -196,7 +222,9 @@ void GraphicsEngine::Render()
 	myContext->ClearRenderTargetView(myRenderTarget.Get(), color);
 	myContext->ClearDepthStencilView(myDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	//ADDED
+	//Added
+	myContext->PSSetSamplers(0, 1, &mySampleState);
+
 	RenderPrimitive(myCube);
 	RenderPrimitive(myPyramid);
 
