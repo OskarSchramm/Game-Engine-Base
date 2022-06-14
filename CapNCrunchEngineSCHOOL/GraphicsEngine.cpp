@@ -302,41 +302,41 @@ bool GraphicsEngine::CreateSamplerState()
 
 bool GraphicsEngine::CreateWaterRenderTarget()
 {
-	HRESULT result;
+	//HRESULT result;
 
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthDesc;
-	myDepthBuffer->GetDesc(&depthDesc);
-	
-	D3D11_TEXTURE2D_DESC textureDesc;
-	myDepthBuffer->GetDesc()
+	//D3D11_DEPTH_STENCIL_VIEW_DESC depthDesc;
+	//myDepthBuffer->GetDesc(&depthDesc);
+	//
+	//D3D11_TEXTURE2D_DESC textureDesc;
+	//myDepthBuffer->GetDesc()
 
-	D3D11_TEXTURE2D_DESC desc = {};
-	desc.Width = textureDesc.Width;
-	desc.Height = textureDesc.Height;
-	desc.MipLevels = 1;
-	desc.ArraySize = 1;
-	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = 0;
+	//D3D11_TEXTURE2D_DESC desc = {};
+	//desc.Width = textureDesc.Width;
+	//desc.Height = textureDesc.Height;
+	//desc.MipLevels = 1;
+	//desc.ArraySize = 1;
+	//desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	//desc.SampleDesc.Count = 1;
+	//desc.SampleDesc.Quality = 0;
+	//desc.Usage = D3D11_USAGE_DEFAULT;
+	//desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	//desc.CPUAccessFlags = 0;
+	//desc.MiscFlags = 0;
 
-	ID3D11Texture2D* texture = nullptr;
-	result = myDevice->CreateTexture2D(&desc, nullptr, &texture);
-	if (FAILED(result))
-		return false;
+	//ID3D11Texture2D* texture = nullptr;
+	//result = myDevice->CreateTexture2D(&desc, nullptr, &texture);
+	//if (FAILED(result))
+	//	return false;
 
-	result = myDevice->CreateShaderResourceView(texture, nullptr, &myWaterReflectionRenderTarget.myShaderResource);
-	if (FAILED(result))
-		return false;
+	//result = myDevice->CreateShaderResourceView(texture, nullptr, &myWaterReflectionRenderTarget.myShaderResource);
+	//if (FAILED(result))
+	//	return false;
 
-	result = myDevice->CreateRenderTargetView(texture, nullptr, &myWaterReflectionRenderTarget.myRenderTargetView);
+	//result = myDevice->CreateRenderTargetView(texture, nullptr, &myWaterReflectionRenderTarget.myRenderTargetView);
 
-	texture->Release();
+	//texture->Release();
 
-	myContext->PSSetShaderResources(0, 1, &myWaterReflectionRenderTarget.myShaderResource);
+	//myContext->PSSetShaderResources(0, 1, &myWaterReflectionRenderTarget.myShaderResource);
 
 	return true;
 }

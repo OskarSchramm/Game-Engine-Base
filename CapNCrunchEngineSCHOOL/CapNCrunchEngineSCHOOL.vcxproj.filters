@@ -1,97 +1,298 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="CU">
+      <UniqueIdentifier>{3D735900-29FF-870B-92AD-880B7E58880B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="external">
+      <UniqueIdentifier>{2839F3DC-1406-4EE8-3D1F-3C90294B8376}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="external\directxtex">
+      <UniqueIdentifier>{DBDE842F-4740-623D-D0AD-A8EF3C0E99FC}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{beb46b33-ec16-4bbe-b230-871f328e4583}</UniqueIdentifier>
+    <Filter Include="external\directxtex\DDSTextureLoader">
+      <UniqueIdentifier>{CDE4298D-B9CB-EB84-621C-52A24EE264EB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\DDSView">
+      <UniqueIdentifier>{C073337B-2C81-6161-B567-5D4C21742D18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\DDSView\shaders">
+      <UniqueIdentifier>{B9F07630-25AA-E1DA-AE09-FCB41AC2974A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\DirectXTex">
+      <UniqueIdentifier>{4E766BB9-3A9C-3520-23E2-BAEB0FA75AEC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\DirectXTex\Shaders">
+      <UniqueIdentifier>{2709501D-135B-270D-FC79-641DE86A40F6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\ScreenGrab">
+      <UniqueIdentifier>{063C543F-F261-1EA6-DBA7-A371C76C4372}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\Texassemble">
+      <UniqueIdentifier>{A72BA604-130F-B544-1C12-E38088747B95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\Texconv">
+      <UniqueIdentifier>{D142769A-3D50-A480-C636-A06B32437037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\Texdiag">
+      <UniqueIdentifier>{F0B3769A-5CC1-A480-E5A7-A06B51B47037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\directxtex\WICTextureLoader">
+      <UniqueIdentifier>{353F7DF1-2126-3FE9-CA76-A506B63CB84F}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GraphicsEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Primitive.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader11.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GraphicsEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Primitive.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader11.h">
-      <Filter>Header Files</Filter>
+      <Filter>external\directxtex\DDSTextureLoader</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader12.h">
+      <Filter>external\directxtex\DDSTextureLoader</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader9.h">
+      <Filter>external\directxtex\DDSTextureLoader</Filter>
     </ClInclude>
-    <ClInclude Include="TextureTypes.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\external\directxtex\DDSView\shaders\ps1D.h">
+      <Filter>external\directxtex\DDSView\shaders</Filter>
     </ClInclude>
+    <ClInclude Include="..\external\directxtex\DDSView\shaders\ps1Darray.h">
+      <Filter>external\directxtex\DDSView\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DDSView\shaders\ps2D.h">
+      <Filter>external\directxtex\DDSView\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DDSView\shaders\ps2Darray.h">
+      <Filter>external\directxtex\DDSView\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DDSView\shaders\ps3D.h">
+      <Filter>external\directxtex\DDSView\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DDSView\shaders\psCube.h">
+      <Filter>external\directxtex\DDSView\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DDSView\shaders\vs.h">
+      <Filter>external\directxtex\DDSView\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\BC.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\BCDirectCompute.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\DDS.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\DirectXTex.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\DirectXTexP.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\d3dx12.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\filters.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\DirectXTex\scoped.h">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\ScreenGrab\ScreenGrab11.h">
+      <Filter>external\directxtex\ScreenGrab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\ScreenGrab\ScreenGrab12.h">
+      <Filter>external\directxtex\ScreenGrab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\ScreenGrab\ScreenGrab9.h">
+      <Filter>external\directxtex\ScreenGrab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\WICTextureLoader\WICTextureLoader11.h">
+      <Filter>external\directxtex\WICTextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\WICTextureLoader\WICTextureLoader12.h">
+      <Filter>external\directxtex\WICTextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\directxtex\WICTextureLoader\WICTextureLoader9.h">
+      <Filter>external\directxtex\WICTextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Input.h">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Matrix3x3.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Matrix4x4.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Quaternion.h">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Random.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Timer.h">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\UtilityFunctions.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Vector2.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Vector3.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Vector4.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="GraphicsEngine.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Primitive.h" />
+    <ClInclude Include="RenderTarget.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureTypes.h" />
+    <ClInclude Include="Vertex.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ColorPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <ClCompile Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader11.cpp">
+      <Filter>external\directxtex\DDSTextureLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader12.cpp">
+      <Filter>external\directxtex\DDSTextureLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader9.cpp">
+      <Filter>external\directxtex\DDSTextureLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DDSView\ddsview.cpp">
+      <Filter>external\directxtex\DDSView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\BC.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\BC4BC5.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\BC6HBC7.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\BCDirectCompute.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexCompress.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexCompressGPU.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexConvert.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexD3D11.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexD3D12.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexDDS.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexFlipRotate.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexHDR.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexImage.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexMipmaps.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexMisc.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexNormalMaps.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexPMAlpha.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexResize.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexTGA.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexUtil.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\DirectXTex\DirectXTexWIC.cpp">
+      <Filter>external\directxtex\DirectXTex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\ScreenGrab\ScreenGrab11.cpp">
+      <Filter>external\directxtex\ScreenGrab</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\ScreenGrab\ScreenGrab12.cpp">
+      <Filter>external\directxtex\ScreenGrab</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\ScreenGrab\ScreenGrab9.cpp">
+      <Filter>external\directxtex\ScreenGrab</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\Texassemble\AnimatedGif.cpp">
+      <Filter>external\directxtex\Texassemble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\Texassemble\texassemble.cpp">
+      <Filter>external\directxtex\Texassemble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\Texconv\ExtendedBMP.cpp">
+      <Filter>external\directxtex\Texconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\Texconv\PortablePixMap.cpp">
+      <Filter>external\directxtex\Texconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\Texconv\texconv.cpp">
+      <Filter>external\directxtex\Texconv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\Texdiag\texdiag.cpp">
+      <Filter>external\directxtex\Texdiag</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\WICTextureLoader\WICTextureLoader11.cpp">
+      <Filter>external\directxtex\WICTextureLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\WICTextureLoader\WICTextureLoader12.cpp">
+      <Filter>external\directxtex\WICTextureLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\directxtex\WICTextureLoader\WICTextureLoader9.cpp">
+      <Filter>external\directxtex\WICTextureLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="CU\Input.cpp">
+      <Filter>CU</Filter>
+    </ClCompile>
+    <ClCompile Include="CU\Random.cpp">
+      <Filter>CU</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="GraphicsEngine.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Primitive.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommonFunctions.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="PBRFunctions.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="ShaderCommon.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="ShaderStructs.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
+    <FxCompile Include="..\external\directxtex\DirectXTex\Shaders\BC6HEncode.hlsl">
+      <Filter>external\directxtex\DirectXTex\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\external\directxtex\DirectXTex\Shaders\BC7Encode.hlsl">
+      <Filter>external\directxtex\DirectXTex\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="color_PS.hlsl" />
+    <FxCompile Include="color_VS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CommonFunctions.hlsli" />
+    <None Include="PBRFunctions.hlsli" />
+    <None Include="ShaderCommon.hlsli" />
+    <None Include="ShaderStructs.hlsli" />
   </ItemGroup>
 </Project>
