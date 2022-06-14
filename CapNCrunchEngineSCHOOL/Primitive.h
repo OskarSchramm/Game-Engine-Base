@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <minwindef.h>
+#include "CU/Matrix4x4.hpp"
 
 struct Vertex;
 
@@ -21,8 +22,11 @@ public:
 	bool Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount);
 	void Render();
 
+	void SetPosition(const CU::Vector3f& aPos);
 	bool SetVertexShader(const LPCWSTR aShaderFilename);
 	bool SetPixelShader(const LPCWSTR aShaderFilename);
+
+	CU::Matrix4x4f GetModelMatrix() { return myModelMatrix; }
 private:
 	void SetIAStuff();
 	void Shutdown();
@@ -37,4 +41,6 @@ private:
 	ID3D11VertexShader* myVertexShader;
 	ID3D11PixelShader* myPixelShader;
 	ID3D11InputLayout* myInputLayout;
+
+	CU::Matrix4x4f myModelMatrix;
 };

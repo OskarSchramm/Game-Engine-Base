@@ -1,19 +1,25 @@
 #include "Primitive.h"
 #include "Vertex.h"
-#include <d3d11.h>
+#include <string>
 
 #pragma comment(lib, "D3DCompiler.lib")
 #include <d3dcompiler.h>
-
-#include <string>
+#include <d3d11.h>
 
 Primitive::Primitive(ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext)
-	: myDevicePtr(aDevice), myDeviceContextPtr(aDeviceContext)
+	: myDevicePtr(aDevice), myDeviceContextPtr(aDeviceContext), 
+	myVertexBuffer(nullptr), myIndexBuffer(nullptr), myVertexShader(nullptr), myPixelShader(nullptr),
+	myInputLayout(nullptr), myIndexCount(0), myModelMatrix({})
 {}
 
 Primitive::~Primitive()
 {
 	Shutdown();
+}
+
+void Primitive::SetPosition(const CU::Vector3f& aPosition)
+{
+	myModelMatrix.SetPositionRelative(aPosition);
 }
 
 bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount)
@@ -51,7 +57,6 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 	HRESULT res;
 
 	ID3DBlob* myVertexBlob;
-
 	std::wstring shaderFilenameCso(aShaderFilename);
 	std::wstring shaderFilenameHlsl(aShaderFilename);
 	shaderFilenameCso = shaderFilenameCso + L".cso";
@@ -70,8 +75,8 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}, 
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	UINT numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -90,8 +95,8 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 bool Primitive::SetPixelShader(const LPCWSTR aShaderFilename)
 {
 	HRESULT res;
-	ID3DBlob* myPixelBlob;
 
+	ID3DBlob* myPixelBlob;
 	std::wstring shaderFilenameCso(aShaderFilename);
 	std::wstring shaderFilenameHlsl(aShaderFilename);
 	shaderFilenameCso = shaderFilenameCso + L".cso";
@@ -135,6 +140,18 @@ void Primitive::Render()
 
 void Primitive::Shutdown()
 {
+	if (myDevicePtr)
+	{
+		myDevicePtr->Release();
+		myDevicePtr = nullptr;
+	}
+
+	if (myDeviceContextPtr)
+	{
+		myDeviceContextPtr->Release();
+		myDeviceContextPtr = nullptr;
+	}
+
 	if (myDevicePtr)
 	{
 		myDevicePtr->Release();

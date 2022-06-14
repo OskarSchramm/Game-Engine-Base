@@ -1,11 +1,23 @@
 #include "GraphicsEngine.h"
+#include <array>
+
 #include <d3d11.h>
 #pragma comment(lib, "d3d11.lib")
 
 #include "Primitive.h"
 #include "Vertex.h"
 
-#include <array>
+namespace CU
+{
+	template<class T>
+	inline Matrix4x4<T> operator*(const Matrix4x4<T>& aLhs, const Matrix4x4<T>& aRhs)
+	{
+		Matrix4x4<T> m;
+		for (size_t row = 0; row < 4; ++row)
+			m.myRows[row] = aLhs.myRows[row] * aRhs;
+		return m;
+	}
+}
 
 GraphicsEngine::GraphicsEngine() = default;
 GraphicsEngine::~GraphicsEngine() = default;
@@ -44,69 +56,135 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 	result = myDevice->CreateRenderTargetView(backBufferTexture, nullptr, &myRenderTarget);
 	if (FAILED(result)) return false;
 
-	myContext->OMSetRenderTargets(1, myRenderTarget.GetAddressOf(), nullptr);
-
+	//Viewport
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	backBufferTexture->GetDesc(&textureDesc);
 	backBufferTexture->Release();
 
+	auto width = static_cast<float>(textureDesc.Width);
+	auto height = static_cast<float>(textureDesc.Height);
+
 	D3D11_VIEWPORT viewport = {0};
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
-	viewport.Width = static_cast<float>(textureDesc.Width);
-	viewport.Height = static_cast<float>(textureDesc.Height);
+	viewport.Width = width;
+	viewport.Height = height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 	myContext->RSSetViewports(1, &viewport);
 
-	myBGTriangle = new Primitive(myDevice.Get(), myContext.Get());
+	//DepthBuffer
+	ID3D11Texture2D* depthBufferTexture;
+	D3D11_TEXTURE2D_DESC depthBufferDesc = {};
+	depthBufferDesc.Width = width;
+	depthBufferDesc.Height = height;
+	depthBufferDesc.ArraySize = 1;
+	depthBufferDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthBufferDesc.SampleDesc.Count = 1;
+	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	result = myDevice->CreateTexture2D(&depthBufferDesc, nullptr, &depthBufferTexture);
+	if (FAILED(result))
+		return false;
+
+	result = myDevice->CreateDepthStencilView(depthBufferTexture, nullptr, &myDepthStencilView);
+	if (FAILED(result))
+		return false;
+
+	//DepthStencil 
+	ID3D11DepthStencilState* depthStencilState;
+	D3D11_DEPTH_STENCIL_DESC depthStencilViewDesc = {};
+	depthStencilViewDesc.DepthEnable = true;
+	depthStencilViewDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilViewDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	myDevice->CreateDepthStencilState(&depthStencilViewDesc, &depthStencilState);
+
+	depthBufferTexture->Release();
+
+	myContext->OMSetRenderTargets(1, myRenderTarget.GetAddressOf(), myDepthStencilView.Get());
+	myContext->OMSetDepthStencilState(depthStencilState, 0);
+
+	//Camera
+	myCamera.Init(CU::Vector3f{ 0.0f, 0.0f, -10.0f }, CU::Vector3f::Zero, 90.0f, CU::Vector2f{ width, height }, 0.01f, 1000.0f);
+
+	//Create ConstantBuffers - objectbuffer
+	D3D11_BUFFER_DESC bufferDesc = {};
+	bufferDesc.ByteWidth = sizeof(ObjectBuffer);
+	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	result = myDevice->CreateBuffer(&bufferDesc, nullptr, &myObjectBuffer);
+	if (FAILED(result))
+		return false;
+
+	//Create ConstantBuffers - framebuffer
+	bufferDesc.ByteWidth = sizeof(FrameBuffer);
+	result = myDevice->CreateBuffer(&bufferDesc, nullptr, &myFrameBuffer);
+	if (FAILED(result))
+		return false;
+
+	//ADDED
+	myCube = new Primitive(myDevice.Get(), myContext.Get());
 	{
 		Vertex vertices[]
 		{
-			{ -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{  0.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f},
-			{  1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f},
+			{-0.5f,-0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{ 0.5f,-0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{ 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{-0.5f,-0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{ 0.5f,-0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{ 0.5f, 0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+			{-0.5f, 0.5f,-0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
 		};
 
 		UINT indices[]
 		{
-			0, 1, 2
+			0, 3, 2, 2, 1, 0,
+			1, 2, 6, 6, 5, 1,
+			5, 6, 7, 7, 4, 5,
+			4, 7, 3, 3, 0, 4,
+			4, 0, 1, 1, 5, 4,
+			3, 7, 6, 6, 2, 3
 		};
 
-		myBGTriangle->Init(vertices, std::size(vertices), indices, std::size(indices));
-		myBGTriangle->SetVertexShader(L"ColorVS");
-		myBGTriangle->SetPixelShader(L"CoolsinwavePS");
-	}
-
-	myCube = new Primitive(myDevice.Get(), myContext.Get());
-	{
-		Vertex vertices2[]
-		{
-			{  0.0f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{ -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-			{ -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
-
-			{  0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.0f, 1.0f},
-			{  0.5f,  0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 0.0f, 1.0f},
-			{  0.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f},
-		};
-
-		UINT indices2[]
-		{
-			0, 1, 2,
-			2, 3, 0,
-
-			0, 5, 4,
-			4, 1, 0,
-
-			0, 6, 5,
-			0, 3, 6
-		};
-
-		myCube->Init(vertices2, std::size(vertices2), indices2, std::size(indices2));
+		myCube->Init(vertices, std::size(vertices), indices, std::size(indices));
+		myCube->SetPosition({0.0f, 0.0f, 0.0f});
 		myCube->SetVertexShader(L"ColorVS");
 		myCube->SetPixelShader(L"ColorPS");
+	}
+
+	//ADDED
+	myPyramid = new Primitive(myDevice.Get(), myContext.Get());
+	{
+		Vertex vertices[]
+		{
+			//Base
+			{ -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f },
+			{  0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+			{ -0.5f, -0.5f,-0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f },
+			{  0.5f, -0.5f,-0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f },
+			// top
+			{ 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f},
+		};
+
+		UINT indices[]
+		{
+			//Bottom Face
+			0, 2, 3,
+			3, 1, 0,
+
+			1, 4, 0,
+			0, 4, 2,
+			2, 4, 3,
+			3, 4, 1,
+		};
+
+		myPyramid->Init(vertices, std::size(vertices), indices, std::size(indices));
+		myPyramid->SetPosition({ 0.0f, 0.0f, 5.0f });
+		myPyramid->SetVertexShader(L"ColorVS");
+		myPyramid->SetPixelShader(L"CoolsinwavePS");
 	}
 
 	return true;
@@ -114,11 +192,52 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 
 void GraphicsEngine::Render()
 {
-	constexpr float color[4] = { 0.97f, 0.59f, 0.38f, 1.0f};
+	constexpr float color[4] = { 0.97f, 0.59f, 0.38f, 1.0f };
 	myContext->ClearRenderTargetView(myRenderTarget.Get(), color);
+	myContext->ClearDepthStencilView(myDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	myBGTriangle->Render();
-	myCube->Render();
+	//ADDED
+	RenderPrimitive(myCube);
+	RenderPrimitive(myPyramid);
 
 	mySwapChain->Present(1, 0);
+}
+
+void GraphicsEngine::RenderPrimitive(Primitive* aPrimitive)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedCBuffer = {};
+
+	//Frame Buffer
+	{
+		FrameBuffer frameBufferData = {};
+		auto worldToClip = CU::Matrix4x4f::GetFastInverse(myCamera.GetViewMatrix()) * myCamera.GetProjectionMatrix();
+
+		frameBufferData.worldToClipMatrix = worldToClip;
+		frameBufferData.totalTime = myTimer.GetTotalTime();
+
+		myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCBuffer);
+		memcpy(mappedCBuffer.pData, &frameBufferData, sizeof(FrameBuffer));
+		myContext->Unmap(myFrameBuffer, 0);
+		myContext->VSSetConstantBuffers(0, 1, &myFrameBuffer);
+	}
+
+	//Object Buffer
+	{
+		ObjectBuffer objectBufferData = {};
+		objectBufferData.objectMatrix = aPrimitive->GetModelMatrix();
+
+		myContext->Map(myObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCBuffer);
+		memcpy(mappedCBuffer.pData, &objectBufferData, sizeof(ObjectBuffer));
+		myContext->Unmap(myObjectBuffer, 0);
+		myContext->VSSetConstantBuffers(1, 1, &myObjectBuffer);
+	}
+
+	aPrimitive->Render();
+}
+
+void GraphicsEngine::Update()
+{
+	myTimer.Update();
+
+	myCamera.Update(myTimer.GetDeltaTime());
 }
