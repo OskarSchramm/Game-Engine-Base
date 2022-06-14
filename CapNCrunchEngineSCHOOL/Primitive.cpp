@@ -17,9 +17,6 @@ Primitive::Primitive(ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext)
 Primitive::~Primitive()
 {
 	Shutdown();
-
-	delete myTexture;
-	myTexture = nullptr;
 }
 
 void Primitive::SetPosition(const CU::Vector3f& aPosition)
@@ -54,7 +51,6 @@ bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aI
 	if (FAILED(res))
 		return false;
 
-	//ADDED
 	if (!myTexture->Init(myDevicePtr, aTextureFileName))
 		return false;
 
@@ -82,11 +78,12 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 	if (FAILED(res))
 		return false;
 
+	//CHANGED
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}, 
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -207,5 +204,8 @@ void Primitive::Shutdown()
 	}
 
 	if (myTexture)
+	{
 		myTexture->Release();
+		myTexture = nullptr;
+	}
 }

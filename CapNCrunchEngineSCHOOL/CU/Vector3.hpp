@@ -68,6 +68,12 @@ namespace CU
 		aVector0.y += aVector1.y;
 		aVector0.z += aVector1.z;
 	}
+	template <class T> void operator+=(Vector3<T>& aVector0, const T& aScalar)
+	{
+		aVector0.x += aScalar;
+		aVector0.y += aScalar;
+		aVector0.z += aScalar;
+	}
 	template <class T> void operator-=(Vector3<T>& aVector0, const Vector3<T>& aVector1) { aVector0 += (-aVector1); }
 	template <class T> void operator*=(Vector3<T>& aVector, const T& aScalar) 
 	{

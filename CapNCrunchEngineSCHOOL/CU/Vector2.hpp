@@ -66,6 +66,7 @@ namespace CU
 	template <class T> void operator/=(Vector2<T>& aVector, const T& aScalar) { aVector *= (T(1) / aScalar); }
 
 	typedef Vector2<float> Vector2f;
+	typedef Vector2<int>   Vector2i;
 
 	template<typename T>
 	const Vector2<T> Vector2<T>::Zero(0, 0, 0);

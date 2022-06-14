@@ -1,7 +1,17 @@
 #pragma once
+
+//stdlib
+#include <vector>
+
+//microsoft dx11
 #include <wrl/client.h>
+
+//cpc cu
 #include "CU/Timer.h"
+
+//cpc
 #include "Camera.h"
+#include "Light.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -14,7 +24,12 @@ struct ID3D11Texture2D;
 struct ID3D11Buffer;
 struct ID3D11SamplerState;
 
+//ADDED
+struct ID3D11DepthStencilState;
+struct Vertex;
+
 class Primitive;
+class Texture;
 
 class GraphicsEngine
 {
@@ -28,15 +43,37 @@ class GraphicsEngine
 	{
 		CU::Matrix4x4f objectMatrix;
 	};
+	struct LightBuffer
+	{
+		CU::Vector4f directionalLightColor;
+		CU::Vector4f skyColor;
+		CU::Vector4f groundColor;
+		CU::Vector3f directionalLightDir;
+		float padding;
+	};
 
 public:
 	GraphicsEngine();
 	~GraphicsEngine();
 
-	bool Init(int aHeight, int aWidth, HWND aWindowHandle);
+	bool Init(int aWidth, int aHeight, HWND aWindowHandle);
 	void Render();
 	void Update();
 private:
+	//ADDED
+	bool CreateDeviceAndSwapChain(HWND* aWindowHandle);
+	bool CreateViewPort(int& aWidth, int& aHeight);
+	bool CreateDepthBufferAndStencil(ID3D11DepthStencilState* anOutDepthStencilState, const UINT aWidth, const UINT aHeight);
+	bool CreateConstantBuffers();
+	bool CreateSamplerState();
+	void UpdateAndBindBuffers();
+
+	//Terrain
+	bool GenerateTerrain();
+	void GenerateVertices(Vertex* outVertices, const std::vector<float>& aHeightMap, const float aResolution);
+	void GenerateNormals(Vertex* outVertices, const size_t amountVertices, const float aResolution);
+	void GenerateIndices(unsigned int* outIndices, const size_t indexCount, const float aResolution);
+
 	void RenderPrimitive(Primitive* aPrimitive);
 
 	ComPtr<ID3D11Device>	       myDevice;
@@ -45,15 +82,18 @@ private:
 	ComPtr<ID3D11RenderTargetView> myRenderTarget;
 	ComPtr<ID3D11DepthStencilView> myDepthStencilView;
 	ComPtr<ID3D11Texture2D>		   myDepthBuffer;
+	ID3D11SamplerState*            mySampleState;
 
 	ID3D11Buffer*				   myFrameBuffer;
 	ID3D11Buffer*                  myObjectBuffer;
 
-	ID3D11SamplerState*            mySampleState;
+	//ADDED
+	ID3D11Buffer*                  myLightBuffer;
 
-	Primitive* myCube;
-	Primitive* myPyramid;
+	//CHANGED/ADDED
+	Primitive* myTerrain; 
+	Light	   myLight;
+
 	Camera	   myCamera;
-
-	CU::Timer myTimer;
+	CU::Timer  myTimer;
 };

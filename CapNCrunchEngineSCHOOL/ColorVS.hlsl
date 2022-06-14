@@ -1,43 +1,18 @@
-cbuffer FrameBuffer : register(b0)
-{
-    float4x4 modelToClipMatrix;
-    float totalTime;
-    float3 padding;
-};
-
-cbuffer ObjectBuffer : register(b1)
-{
-    float4x4 modelMatrix;
-};
-
-struct VertexInputType
-{
-    float4 position : POSITION;
-    float4 color : COLOR;
-    float2 uv : TEXCOORD;
-};
-
-struct PixelInputType
-{
-    float4 position : SV_POSITION;
-    float4 color : COLOR;
-    float2 uv : TEXCOORD;
-    float totalTime : TIME;
-    float4 worldPos : WORLDPOS;
-};
+#include "ShaderCommon.hlsli"
 
 PixelInputType main(VertexInputType input)
 {
     PixelInputType output;
     
-    float4 worldPos = mul(modelMatrix, input.position);
+    float4 pos = float4(input.position, 1.0f);
+    float4 worldPos = mul(modelMatrix, pos);
     float4 vertexToClipPos = mul(modelToClipMatrix, worldPos);
-
-    output.worldPos = worldPos;
     output.position = vertexToClipPos;
     
-    output.totalTime = totalTime;
-    output.color = input.color;
+    float4 vertexObjectNormal = float4(input.normal, 0.0f);
+    float4 vertexWorldNormal  = mul(modelMatrix, vertexObjectNormal);
+    output.normal = vertexWorldNormal;
+    
     output.uv = input.uv;
     
     return output;

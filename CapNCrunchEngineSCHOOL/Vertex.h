@@ -1,8 +1,10 @@
 #pragma once
+#include "CU/Vector2.hpp"
+#include "CU/Vector3.hpp"
 
 struct Vertex
 {
-	float x, y, z, w;
-	float r, g, b, a;
-	float u, v;
+	CU::Vector3f position;
+	CU::Vector3f normal;
+	CU::Vector2f uv;
 };
