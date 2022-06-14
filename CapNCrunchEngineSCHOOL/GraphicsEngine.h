@@ -1,6 +1,8 @@
 #pragma once
 #include <wrl/client.h>
 
+class Primitive;
+
 using Microsoft::WRL::ComPtr;
 
 struct ID3D11Device;
@@ -22,5 +24,6 @@ private:
 	ComPtr<IDXGISwapChain>         mySwapChain;
 	ComPtr<ID3D11RenderTargetView> myRenderTarget;
 
-	bool myVsyncEnabled;
+	Primitive* myBGTriangle;
+	Primitive* myCube;
 };
