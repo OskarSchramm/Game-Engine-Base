@@ -11,6 +11,7 @@ enum class TextureType;
 
 class Texture
 {
+	friend struct TextureData;
 public:
 	Texture();
 	~Texture();
@@ -22,6 +23,7 @@ public:
 	void Release();
 
 	inline bool IsLoaded() { return myResourceView ? true : false; }
+	inline ID3D11ShaderResourceView* GetTextureResource() { return myResourceView; }
 private:
 	bool dx_load(ID3D11Device* aDevice, const wchar_t* aTextureName);
 

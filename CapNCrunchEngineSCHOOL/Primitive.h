@@ -16,21 +16,30 @@ struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 struct ID3D11InputLayout;
 
+//ADDED
+struct ID3D11ShaderResourceView;
+
 class Primitive
 {
 public:
 	Primitive(ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext);
 	~Primitive();
 
-	bool Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount, const wchar_t** someTexturePaths, UINT aTextureSize);
+	bool Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount, const wchar_t** someTexturePaths = nullptr, UINT aTextureSize = 0);
 	void Render();
 
 	void SetPosition(const CU::Vector3f& aPos);
 	bool SetVertexShader(const LPCWSTR aShaderFilename);
 	bool SetPixelShader(const LPCWSTR aShaderFilename);
 
-	CU::Matrix4x4f GetModelMatrix() { return myModelMatrix; }
+	CU::Matrix4x4f& GetModelMatrix() { return myModelMatrix; }
+
+	void AddTexture(ID3D11ShaderResourceView* aShaderResource, const int aSlot);
+
+	std::vector<TextureData>& GetTextures() { return myTextures; }
 private:
+	bool InitializeBuffers(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount);
+
 	void SetIAStuff();
 	void Shutdown();
 

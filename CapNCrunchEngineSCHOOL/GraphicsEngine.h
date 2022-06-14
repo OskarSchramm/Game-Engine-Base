@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Texture.h"
+#include "RenderTarget.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -59,40 +60,45 @@ public:
 	void Render();
 	void Update();
 private:
-	//ADDED
 	bool CreateDeviceAndSwapChain(HWND* aWindowHandle);
 	bool CreateViewPort(int& aWidth, int& aHeight);
-	bool CreateDepthBufferAndStencil(ID3D11DepthStencilState* anOutDepthStencilState, const UINT aWidth, const UINT aHeight);
+	bool CreateDepthBufferAndStencil(const UINT aWidth, const UINT aHeight);
 	bool CreateConstantBuffers();
 	bool CreateSamplerState();
 	void UpdateAndBindBuffers();
 
-	//Terrain
+	//ADDED
+	bool CreateWaterRenderTarget();
+	bool GeneratePlane(const float aSize, const float aHeightPosition);
+	void RenderWaterToTexture();
+
 	bool GenerateTerrain();
 	void GenerateVertices(Vertex* outVertices, const std::vector<float>& aHeightMap, const float aResolution);
 	void GenerateNormals(Vertex* outVertices, const size_t amountVertices, const float aResolution);
 	void GenerateIndices(unsigned int* outIndices, const size_t indexCount, const float aResolution);
-
+	
 	void RenderPrimitive(Primitive* aPrimitive);
 
 	ComPtr<ID3D11Device>	       myDevice;
 	ComPtr<ID3D11DeviceContext>    myContext;
 	ComPtr<IDXGISwapChain>         mySwapChain;
-	ComPtr<ID3D11RenderTargetView> myRenderTarget;
-	ComPtr<ID3D11DepthStencilView> myDepthStencilView;
-	ComPtr<ID3D11Texture2D>		   myDepthBuffer;
+
+	ComPtr<ID3D11RenderTargetView> myBackBuffer;
+	ID3D11DepthStencilView*		   myDepthBuffer;
+
 	ID3D11SamplerState*            mySampleState;
 
 	ID3D11Buffer*				   myFrameBuffer;
 	ID3D11Buffer*                  myObjectBuffer;
-
-	//ADDED
 	ID3D11Buffer*                  myLightBuffer;
 
-	//CHANGED/ADDED
-	Texture    myCubeMap;
+	Primitive* myTerrain;
 
-	Primitive* myTerrain; 
+	const float myWaterHeight = -0.25f;
+	Primitive* myWaterPlane;
+	RenderTarget myWaterReflectionRenderTarget;
+
+	Texture    myCubeMap;
 	Light	   myLight;
 
 	Camera	   myCamera;

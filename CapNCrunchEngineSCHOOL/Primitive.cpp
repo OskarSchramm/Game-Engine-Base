@@ -31,6 +31,27 @@ void Primitive::SetPosition(const CU::Vector3f& aPosition)
 
 bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount, const wchar_t** someTexturePaths, UINT aTextureSize)
 {
+	if (!InitializeBuffers(vertices, aVertexCount, indices, aIndexCount))
+		return false;
+
+	if (!someTexturePaths)
+		return true;
+
+	for (size_t i = 0; i < aTextureSize; i++)
+	{
+		bool albedoTexture = true;
+		if (i > 2)
+		{
+			albedoTexture = false;
+		}
+		auto texture = someTexturePaths[i];
+		auto& itr = myTextures.emplace_back(i);
+		itr.myResource.Init(myDevicePtr, myDeviceContextPtr, texture, true, albedoTexture, true); //Changed
+	}
+}
+
+bool Primitive::InitializeBuffers(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount)
+{
 	myIndexCount = aIndexCount;
 
 	HRESULT res;
@@ -55,18 +76,6 @@ bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aI
 	res = myDevicePtr->CreateBuffer(&indexDesc, &myIndexData, &myIndexBuffer);
 	if (FAILED(res))
 		return false;
-
-	for (size_t i = 0; i < aTextureSize; i++)
-	{
-		bool albedoTexture = true;
-		if (i > 2)
-		{
-			albedoTexture = false;
-		}
-		auto texture = someTexturePaths[i];
-		auto& itr = myTextures.emplace_back((TextureType)i);
-		itr.myResource.Init(myDevicePtr, myDeviceContextPtr, texture, true, albedoTexture, true); //Changed
-	}
 
 	return true;
 }
@@ -145,6 +154,11 @@ void Primitive::SetIAStuff()
 {
 	myDeviceContextPtr->IASetInputLayout(myInputLayout);
 	myDeviceContextPtr->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Primitive::AddTexture(ID3D11ShaderResourceView* aShaderResource, const int aSlot)
+{
+	myTextures.emplace_back(aShaderResource, aSlot);
 }
 
 void Primitive::Render()

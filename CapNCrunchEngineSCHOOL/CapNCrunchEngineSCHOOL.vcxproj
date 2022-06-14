@@ -154,6 +154,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Primitive.cpp" />
+    <ClCompile Include="RenderTarget.h" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>

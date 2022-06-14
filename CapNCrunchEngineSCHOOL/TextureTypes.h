@@ -18,17 +18,22 @@ enum class TextureType
 	CubeMap
 };
 
-struct TexturePaths
-{
-	const wchar_t* myGrassAlbedo;
-	const wchar_t* myStoneAlbedo;
-	const wchar_t* mySnowAlbedo;
-};
+struct ID3D11ShaderResourceView;
 
 class Texture;
 struct TextureData
 {
-	TextureData(TextureType aSlot) { mySlotType = aSlot; }
+	TextureData(const int aSlot)
+	{
+		mySlotType = (TextureType)aSlot;
+	}
+
+	TextureData(ID3D11ShaderResourceView* aShaderResource, const int aSlot)
+	{ 
+		mySlotType = (TextureType)aSlot;
+		myResource.myResourceView = aShaderResource;
+	}
+
 	TextureType mySlotType;
 	Texture myResource;
 };

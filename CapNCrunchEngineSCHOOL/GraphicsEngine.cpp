@@ -122,13 +122,11 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	if (!CreateViewPort(aWidth, aHeight))
 		return false;
 
-	//RenderTarget And Depth Stencil
-	ID3D11DepthStencilState* depthStencilState = nullptr;
-	if (!CreateDepthBufferAndStencil(depthStencilState, aWidth, aHeight))
+	if (!CreateDepthBufferAndStencil(aWidth, aHeight))
 		return false;
 
-	myContext->OMSetRenderTargets(1, myRenderTarget.GetAddressOf(), myDepthStencilView.Get());
-	myContext->OMSetDepthStencilState(depthStencilState, 0);
+	//NO need
+	myContext->OMSetRenderTargets(1, myBackBuffer.GetAddressOf(), myDepthBuffer);
 
 	if (!CreateConstantBuffers())
 		return false;
@@ -141,11 +139,11 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	myLight.SetDirectionalLight({ 0.5f, -0.5f, 0.0f }, {0.1f, 0.1f, 0.1, 0.5f});
 	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25f, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f }); 
 
-	//ADDED
 	myCubeMap.Init(myDevice.Get(), myContext.Get(), L"../../data/textures/cube_1024_preblurred_angle3_Skansen3.dds");
 	myCubeMap.BindPS(myContext.Get(), TextureType::CubeMap);
 
 	GenerateTerrain();
+	GeneratePlane(20, myWaterHeight);
 
 	return true;
 }
@@ -187,7 +185,7 @@ bool GraphicsEngine::CreateViewPort(int& aWidth, int& aHeight)
 	result = mySwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBufferTexture);
 	if (FAILED(result)) return false;
 
-	result = myDevice->CreateRenderTargetView(backBufferTexture, nullptr, &myRenderTarget);
+	result = myDevice->CreateRenderTargetView(backBufferTexture, nullptr, &myBackBuffer);
 	if (FAILED(result)) return false;
 
 	//Viewport
@@ -212,9 +210,10 @@ bool GraphicsEngine::CreateViewPort(int& aWidth, int& aHeight)
 	return true;
 }
 
-bool GraphicsEngine::CreateDepthBufferAndStencil(ID3D11DepthStencilState* anOutDepthStencilState, const UINT aWidth, const UINT aHeight)
+bool GraphicsEngine::CreateDepthBufferAndStencil(const UINT aWidth, const UINT aHeight)
 {
 	HRESULT result;
+	ID3D11DepthStencilState* depthStencilState = nullptr;
 
 	//DepthBuffer
 	ID3D11Texture2D* depthBufferTexture;
@@ -230,7 +229,7 @@ bool GraphicsEngine::CreateDepthBufferAndStencil(ID3D11DepthStencilState* anOutD
 	if (FAILED(result))
 		return false;
 
-	result = myDevice->CreateDepthStencilView(depthBufferTexture, nullptr, &myDepthStencilView);
+	result = myDevice->CreateDepthStencilView(depthBufferTexture, nullptr, &myDepthBuffer);
 	if (FAILED(result)) 
 		return false;
 
@@ -240,8 +239,10 @@ bool GraphicsEngine::CreateDepthBufferAndStencil(ID3D11DepthStencilState* anOutD
 	depthStencilViewDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilViewDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-	result = myDevice->CreateDepthStencilState(&depthStencilViewDesc, &anOutDepthStencilState);
+	result = myDevice->CreateDepthStencilState(&depthStencilViewDesc, &depthStencilState);
 	if (FAILED(result)) return false;
+
+	myContext->OMSetDepthStencilState(depthStencilState, 0);
 
 	depthBufferTexture->Release();
 
@@ -295,6 +296,77 @@ bool GraphicsEngine::CreateSamplerState()
 	result = myDevice->CreateSamplerState(&sampleDesc, &mySampleState);
 	if (FAILED(result))
 		return false;
+
+	return true;
+}
+
+bool GraphicsEngine::CreateWaterRenderTarget()
+{
+	HRESULT result;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthDesc;
+	myDepthBuffer->GetDesc(&depthDesc);
+	
+	D3D11_TEXTURE2D_DESC textureDesc;
+	myDepthBuffer->GetDesc()
+
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = textureDesc.Width;
+	desc.Height = textureDesc.Height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	ID3D11Texture2D* texture = nullptr;
+	result = myDevice->CreateTexture2D(&desc, nullptr, &texture);
+	if (FAILED(result))
+		return false;
+
+	result = myDevice->CreateShaderResourceView(texture, nullptr, &myWaterReflectionRenderTarget.myShaderResource);
+	if (FAILED(result))
+		return false;
+
+	result = myDevice->CreateRenderTargetView(texture, nullptr, &myWaterReflectionRenderTarget.myRenderTargetView);
+
+	texture->Release();
+
+	myContext->PSSetShaderResources(0, 1, &myWaterReflectionRenderTarget.myShaderResource);
+
+	return true;
+}
+
+bool GraphicsEngine::GeneratePlane(const float aSize, const float aHeightPosition)
+{
+	CU::Vector3f position;
+	CU::Vector2f uv;
+	CU::Vector3f normal;
+	CU::Vector3f tangent;
+	CU::Vector3f bitangent;
+	Vertex vertices[]
+	{
+		CU::Vector3f{0.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		CU::Vector3f{0.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		CU::Vector3f{1.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		CU::Vector3f{1.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+	};
+
+	unsigned int indices[]
+	{
+		0, 1, 3,
+		3, 2, 0
+	};
+
+	myWaterPlane = new Primitive(myDevice.Get(), myContext.Get());
+	myWaterPlane->Init(vertices, 4, indices, std::size(indices));
+	myWaterPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
+	myWaterPlane->SetVertexShader(L"ColorVS");
+	myWaterPlane->SetPixelShader(L"ColorPS");
 
 	return true;
 }
@@ -486,13 +558,27 @@ void GraphicsEngine::UpdateAndBindBuffers()
 void GraphicsEngine::Render()
 {
 	constexpr float color[4] = { 0.97f, 0.59f, 0.38f, 1.0f };
-	myContext->ClearRenderTargetView(myRenderTarget.Get(), color);
-	myContext->ClearDepthStencilView(myDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	myContext->ClearRenderTargetView(myBackBuffer.Get(), color);
+	myContext->ClearDepthStencilView(myDepthBuffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	myContext->PSSetSamplers(0, 1, &mySampleState);
 
-	//Changed
+	//Render to texture upside down
+	RenderWaterToTexture();
+
 	UpdateAndBindBuffers();
 	RenderPrimitive(myTerrain);
+
+	RenderPrimitive(myWaterPlane); //With the appropriate texutre
+
+	mySwapChain->Present(1, 0);
+}
+
+void GraphicsEngine::RenderWaterToTexture()
+{
+	//myCamera.SetRotation({ 0.0f, 0.0f, 180.0f });
+
+	myTerrain->GetModelMatrix()(1, 1) = myTerrain->GetModelMatrix()(1, 1) * -1;
+	myTerrain->GetModelMatrix()(1, 3) = 2 * -myWaterHeight;
 
 	mySwapChain->Present(1, 0);
 }
