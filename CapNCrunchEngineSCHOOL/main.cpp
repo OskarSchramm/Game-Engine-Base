@@ -50,7 +50,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow)
 		}
 
 		graphicsEngine.Render();
-		graphicsEngine.Update();
 	}
 
 	return (int)msg.wParam;
