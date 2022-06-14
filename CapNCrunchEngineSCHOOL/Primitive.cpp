@@ -65,7 +65,7 @@ bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aI
 		}
 		auto texture = someTexturePaths[i];
 		auto& itr = myTextures.emplace_back((TextureType)i);
-		itr.myResource.Init(myDevicePtr, myDeviceContextPtr, texture, true, albedoTexture, true);
+		itr.myResource.Init(myDevicePtr, myDeviceContextPtr, texture, true, albedoTexture, true); //Changed
 	}
 
 	return true;
@@ -150,7 +150,7 @@ void Primitive::SetIAStuff()
 void Primitive::Render()
 {
 	for (auto& t : myTextures)
-		t.myResource.Bind(myDeviceContextPtr, &t.mySlotType);
+		t.myResource.BindPS(myDeviceContextPtr, t.mySlotType);
 
 	UINT strides = sizeof(Vertex);
 	UINT offset = 0;

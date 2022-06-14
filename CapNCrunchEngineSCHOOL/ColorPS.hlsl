@@ -1,47 +1,75 @@
+#include "ShaderStructs.hlsli"
 #include "ShaderCommon.hlsli"
+#include "CommonFunctions.hlsli"
+#include "PBRFunctions.hlsli"
 
 PixelOutput main(PixelInputType input)
 {
     PixelOutput result;
     
+    float3 toEye = normalize(cameraPosition.xyz - input.worldPosition.xyz);
+    
     //TBN Matrix in Object Space
     float3x3 TBN = float3x3(input.tangent, input.bitangent, input.normal);
     
-    //Albedo
-    float4 sampledGrassA = grassTexture.Sample(sampleState, input.uv.xy).rgba;
-    float4 sampledRockA  = rockTexture.Sample(sampleState, input.uv.xy).rgba;
-    float4 sampledSnowA  = snowTexture.Sample(sampleState, input.uv.xy).rgba;
+    //Albedos
+    float4 grassA = grassTexture.Sample(sampleState, input.uv.xy).rgba;
+    float4 rockA  = rockTexture.Sample(sampleState, input.uv.xy).rgba;
+    float4 snowA  = snowTexture.Sample(sampleState, input.uv.xy).rgba;
     
-    //Grass Normal
-    float4 sampledGrassN        = grassNormal.Sample(sampleState, input.uv.xy).rgba;
-    float3 sampledGrassNormal   = expandNormal(sampledGrassN);
+    //Normals
+    float4 grassNIn = grassNormal.Sample(sampleState, input.uv).rgba;
+    float4 rockNIn = rockNormal.Sample(sampleState, input.uv).rgba;
+    float4 snowNIn = snowNormal.Sample(sampleState, input.uv).rgba;
+    float3 grassN = expandNormal(grassNIn);
+    float3 rockN = expandNormal(rockNIn);
+    float3 snowN = expandNormal(snowNIn);
     
-    //Rock Normal
-    float4 sampledRockN        = rockNormal.Sample(sampleState, input.uv.xy).rgba;
-    float3 sampledRockNormal   = expandNormal(sampledRockN);
-    
-    //Snow Normal
-    float4 sampledSnowN        = snowNormal.Sample(sampleState, input.uv.xy).rgba;
-    float3 sampledSnowNormal   = expandNormal(sampledSnowN);
-    
-    //LightColor
-    float4 materialColor = directionalLightColor;
-    float4 sky    = (0.5f + 0.5f * input.normal.y) * skyColor;
-    float4 ground = (0.5f - 0.5f * input.normal.y) * groundColor;
+    //Materials
+    float3 grassM = grassMaterial.Sample(sampleState, input.uv.xy).rgba; //r = metalness, g = roughness, b = emissive
+    float3 rockM  = rockMaterial.Sample(sampleState, input.uv.xy).rgba; //r = metalness, g = roughness, b = emissive
+    float3 snowM  = snowMaterial.Sample(sampleState, input.uv.xy).rgba; //r = metalness, g = roughness, b = emissive
+    grassM.g = smoothstep(0.85, 1.0, grassM.g);
+    rockM.g = smoothstep(0.85, 1.0, rockM.g);
+    snowM.g = smoothstep(0.85, 1.0, snowM.g);
     
     //Lerping terrain
     float slopeBlend  = smoothstep(0.7f, 1.0f, input.normal.y);
     float heightBlend = smoothstep(-0.05f, 0.25f, input.worldPosition.y);
-    float3 albedoColor = lerp(sampledRockA, lerp(sampledGrassA, sampledSnowA, heightBlend), slopeBlend).rgb;
-    float3 normal = lerp(sampledRockNormal, lerp(sampledGrassNormal, sampledSnowNormal, heightBlend), slopeBlend);
+    
+    float ao = lerp(rockNIn.b, lerp(grassNIn.b, snowNIn.b, heightBlend), slopeBlend);
+    
+    float3 albedo = lerp(rockA, lerp(grassA, snowA, heightBlend), slopeBlend).rgb;
+    float3 normal = lerp(rockN, lerp(grassN, snowN, heightBlend), slopeBlend);  
+    float3 material = lerp(rockM, lerp(grassM, snowM, heightBlend), slopeBlend);
     normal = normalize(mul(normal, TBN));
     
-    //Calculate light
-    float4 ambient = (sky + ground);
-    float4 diffuse = directionalLightColor * max(0.1f, dot(directionalLightDir, normal));
+    //LightColor
+    float ambientScalar = 0.05f;
+    float4 sky    = saturate(0.5f - 0.55f * input.normal.y) * skyColor    * ambientScalar;
+    float4 ground = saturate(0.5f + 0.35f * input.normal.y) * groundColor * ambientScalar;
     
-    materialColor = float4(albedoColor, 1.0) * (diffuse + ambient);
-    result.color = materialColor;
+    //Calculate light
+    float3 specularColor = lerp((float3) 0.04f, albedo.rgb, material.r);
+    float3 diffuseColor = lerp((float3) 0.00f, albedo.rgb, 1 - material.r);
+    
+    float3 ambiance = EvaluateAmbiance(
+		cubeMap, normal, input.normal,
+		toEye, material.g,
+		ao, diffuseColor, specularColor
+	);
+
+    float3 dirL = EvaluateDirectionalLight(
+		diffuseColor, specularColor, normal, material.g,
+		directionalLightColor.xyz, directionalLightDir, toEye.xyz
+	);
+    
+    //float3 emissiveAlbedo = albedo.rgb * material.b;
+    float3 radiance = float3(sky.xyz + ground.xyz) + dirL + ambiance;
+    
+    float3 finalColor = radiance;
+    result.color.rgb = tonemap_s_gamut3_cine(finalColor);
+    result.color.a = 1.0f;
     
     return result;
 }

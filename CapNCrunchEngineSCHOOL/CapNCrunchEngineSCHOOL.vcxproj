@@ -186,7 +186,10 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="CommonFunctions.hlsli" />
+    <None Include="PBRFunctions.hlsli" />
     <None Include="ShaderCommon.hlsli" />
+    <None Include="ShaderStructs.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

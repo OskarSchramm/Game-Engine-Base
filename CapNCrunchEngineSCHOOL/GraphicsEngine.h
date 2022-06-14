@@ -12,6 +12,7 @@
 //cpc
 #include "Camera.h"
 #include "Light.h"
+#include "Texture.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -23,21 +24,19 @@ struct ID3D11DepthStencilView;
 struct ID3D11Texture2D;
 struct ID3D11Buffer;
 struct ID3D11SamplerState;
-
-//ADDED
 struct ID3D11DepthStencilState;
-struct Vertex;
 
+struct Vertex;
 class Primitive;
-class Texture;
+
 
 class GraphicsEngine
 {
 	struct FrameBuffer
 	{
 		CU::Matrix4x4f worldToClipMatrix;
+		CU::Vector3f cameraPos;
 		float totalTime;
-		float padding[3];
 	};
 	struct ObjectBuffer
 	{
@@ -91,6 +90,8 @@ private:
 	ID3D11Buffer*                  myLightBuffer;
 
 	//CHANGED/ADDED
+	Texture    myCubeMap;
+
 	Primitive* myTerrain; 
 	Light	   myLight;
 

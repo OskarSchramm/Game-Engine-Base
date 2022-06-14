@@ -17,6 +17,7 @@ public:
 
 	inline CU::Matrix4x4f& GetViewMatrix() { return myViewMatrix; }
 	inline CU::Matrix4x4f& GetProjectionMatrix() { return myProjectionMatrix; }
+	inline CU::Matrix4x4f& GetTransform() { return myTransform; }
 private:
 	float myNearPlane;
 	float myFarPlane;

@@ -9,6 +9,13 @@ enum class TextureType
 	GrassNormal,
 	StoneNormal,
 	SnowNormal,
+
+	//ADDED
+	GrassMaterial,
+	StoneMaterial,
+	SnowMaterial,
+
+	CubeMap
 };
 
 struct TexturePaths
@@ -16,10 +23,6 @@ struct TexturePaths
 	const wchar_t* myGrassAlbedo;
 	const wchar_t* myStoneAlbedo;
 	const wchar_t* mySnowAlbedo;
-
-	const wchar_t* myGrassNormal;
-	const wchar_t* myStoneNormal;
-	const wchar_t* mySnowNormal;
 };
 
 class Texture;

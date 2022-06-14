@@ -17,7 +17,7 @@ public:
 
 	//useSrgb true for default textures, false for detailed textures, specific use cases such as normals
 	bool Init(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, const wchar_t* aTextureName, bool useStbImage = false, bool useSrgb = true, bool generateMipMap = false);
-	void Bind(ID3D11DeviceContext* aContext, TextureType* aType);
+	void BindPS(ID3D11DeviceContext* aContext, const TextureType& aType);
 
 	void Release();
 
@@ -27,6 +27,8 @@ private:
 
 	bool stb_load(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, const wchar_t* aTextureName);
 	bool stb_init(ID3D11Device* device, ID3D11DeviceContext* aContext, unsigned char* rgbaPixels, int width, int height);
+
+	bool GenerateMipMap(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, D3D11_TEXTURE2D_DESC& aDesc, ID3D11Texture2D* aTexture, unsigned char* rgbaPixels, int width, int height);
 
 	bool myIsSrgb = true;
 	bool myGenMipMap = false;

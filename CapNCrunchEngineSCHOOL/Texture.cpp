@@ -77,20 +77,7 @@ bool Texture::stb_init(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, uns
 
 	if (myGenMipMap)
 	{
-		desc.MipLevels = 0;
-		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-		desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-
-		if (FAILED(aDevice->CreateTexture2D(&desc, nullptr, &texture)))
-			return false;
-
-		HRESULT hr = aDevice->CreateShaderResourceView(texture, NULL, &myResourceView);
-		if (FAILED(hr))
-			return false;
-
-		aContext->UpdateSubresource(texture, 0, nullptr, (void*)rgbaPixels, width * 4, width * height * 4);
-		aContext->GenerateMips(myResourceView);
+		GenerateMipMap(aDevice, aContext, desc, texture, rgbaPixels, width, height);
 	}
 	else
 	{
@@ -111,13 +98,34 @@ bool Texture::stb_init(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, uns
 			return false;
 	}
 
-	texture->Release();
+	if(texture)
+		texture->Release();
+
+	delete texture;
 	return true;
 }
 
-void Texture::Bind(ID3D11DeviceContext* aContext, TextureType* aType)
+bool Texture::GenerateMipMap(ID3D11Device* aDevice, ID3D11DeviceContext* aContext, D3D11_TEXTURE2D_DESC& aDesc, ID3D11Texture2D* aTexture, unsigned char* rgbaPixels, int width, int height)
 {
-	aContext->PSSetShaderResources((UINT)*aType, 1, &myResourceView);
+	aDesc.MipLevels = 0;
+	aDesc.Usage = D3D11_USAGE_DEFAULT;
+	aDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	aDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+	if (FAILED(aDevice->CreateTexture2D(&aDesc, nullptr, &aTexture)))
+		return false;
+
+	HRESULT hr = aDevice->CreateShaderResourceView(aTexture, NULL, &myResourceView);
+	if (FAILED(hr))
+		return false;
+
+	aContext->UpdateSubresource(aTexture, 0, nullptr, (void*)rgbaPixels, width * 4, width * height * 4);
+	aContext->GenerateMips(myResourceView);
+}
+
+void Texture::BindPS(ID3D11DeviceContext* aContext, const TextureType& aType)
+{
+	aContext->PSSetShaderResources((UINT)aType, 1, &myResourceView);
 }
 
 void Texture::Release()

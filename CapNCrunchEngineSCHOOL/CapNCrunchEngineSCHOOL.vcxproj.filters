@@ -78,7 +78,16 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="CommonFunctions.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="PBRFunctions.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
     <None Include="ShaderCommon.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="ShaderStructs.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

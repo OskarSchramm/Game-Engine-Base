@@ -138,8 +138,12 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 
 	myCamera.Init(CU::Vector3f{ 0.0f, 5.0f, -5.0f }, {45.0f, 45.0f, 0.0f}, 90.0f, CU::Vector2f{ (float)aWidth, (float)aHeight }, 0.01f, 1000.0f);
 
-	myLight.SetDirectionalLight({ 0.5f, -0.5f, 0.0f }, {0.2f, 0.3f, 0.75, 1.0f});
-	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f }); //
+	myLight.SetDirectionalLight({ 0.5f, -0.5f, 0.0f }, {0.1f, 0.1f, 0.1, 0.5f});
+	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25f, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f }); 
+
+	//ADDED
+	myCubeMap.Init(myDevice.Get(), myContext.Get(), L"../../data/textures/cube_1024_preblurred_angle3_Skansen3.dds");
+	myCubeMap.BindPS(myContext.Get(), TextureType::CubeMap);
 
 	GenerateTerrain();
 
@@ -278,12 +282,12 @@ bool GraphicsEngine::CreateSamplerState()
 	HRESULT result;
 
 	D3D11_SAMPLER_DESC sampleDesc = {};
-	sampleDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	sampleDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	sampleDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	sampleDesc.MipLODBias = 0.0f;
-	sampleDesc.MaxAnisotropy = 1.0f;
+	sampleDesc.MaxAnisotropy = 8.0f;
 	sampleDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	sampleDesc.MinLOD = 0.0f;
 	sampleDesc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -331,7 +335,11 @@ bool GraphicsEngine::GenerateTerrain()
 									  
 		L"../../data/textures/Grass_n.png",
 		L"../../data/textures/Rock_n.png",
-		L"../../data/textures/Snow_n.png"
+		L"../../data/textures/Snow_n.png",
+
+		L"../../data/textures/Grass_m.png",
+		L"../../data/textures/Rock_m.png",
+		L"../../data/textures/Snow_m.png",
 	};
 
 	myTerrain = new Primitive(myDevice.Get(), myContext.Get());
@@ -442,11 +450,13 @@ void GraphicsEngine::UpdateAndBindBuffers()
 
 		frameBufferData.worldToClipMatrix = worldToClip;
 		frameBufferData.totalTime = myTimer.GetTotalTime();
+		frameBufferData.cameraPos = myCamera.GetTransform().GetPosition();
 
 		myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCBuffer);
 		memcpy(mappedCBuffer.pData, &frameBufferData, sizeof(FrameBuffer));
 		myContext->Unmap(myFrameBuffer, 0);
 		myContext->VSSetConstantBuffers(0, 1, &myFrameBuffer);
+		myContext->PSSetConstantBuffers(0, 1, &myFrameBuffer);
 	}
 
 	ZeroMemory(&mappedCBuffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -510,7 +520,7 @@ void GraphicsEngine::Update()
 	float t = myTimer.GetTotalTime();
 	float rotSpeed = 0.3f;
 	myLight.SetDirectionalLight({std::sin(t * rotSpeed), std::cos(t * rotSpeed), 0.0f}, {1.0f, 1.0f, 1.0, 1.0f});
-	myLight.SetAmbientLight({ 1.0f - CU::Clamp(0.1f, 0.8f, CU::Clamp(0.0f, 0.8f, std::sin(t * rotSpeed))), 0.25f, 0.35, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f });
+	//myLight.SetAmbientLight({ 1.0f - CU::Clamp(0.1f, 0.8f, CU::Clamp(0.0f, 0.8f, std::sin(t * rotSpeed))), 0.25f, 0.35, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f });
 
 	myTimer.Update();
 
