@@ -1,7 +1,13 @@
+//AUTHOR OSKAR SCHRAMM 2k22
+
+//cpc
 #include "Primitive.h"
 #include "Vertex.h"
+
+//stdlib
 #include <string>
 
+//d3d
 #pragma comment(lib, "D3DCompiler.lib")
 #include <d3dcompiler.h>
 #include <d3d11.h>
@@ -11,7 +17,6 @@ Primitive::Primitive(ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext)
 	myVertexBuffer(nullptr), myIndexBuffer(nullptr), myVertexShader(nullptr), myPixelShader(nullptr),
 	myInputLayout(nullptr), myIndexCount(0), myModelMatrix({})
 {
-	myTexture = new Texture();
 }
 
 Primitive::~Primitive()
@@ -24,7 +29,7 @@ void Primitive::SetPosition(const CU::Vector3f& aPosition)
 	myModelMatrix.SetPositionRelative(aPosition);
 }
 
-bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount, const wchar_t* aTextureFileName)
+bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aIndexCount, const wchar_t** someTexturePaths, UINT aTextureSize)
 {
 	myIndexCount = aIndexCount;
 
@@ -51,8 +56,17 @@ bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aI
 	if (FAILED(res))
 		return false;
 
-	if (!myTexture->Init(myDevicePtr, aTextureFileName))
-		return false;
+	for (size_t i = 0; i < aTextureSize; i++)
+	{
+		bool albedoTexture = true;
+		if (i > 2)
+		{
+			albedoTexture = false;
+		}
+		auto texture = someTexturePaths[i];
+		auto& itr = myTextures.emplace_back((TextureType)i);
+		itr.myResource.Init(myDevicePtr, myDeviceContextPtr, texture, true, albedoTexture, true);
+	}
 
 	return true;
 }
@@ -81,9 +95,11 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 	//CHANGED
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"POSITION" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD" , 0, DXGI_FORMAT_R32G32_FLOAT   , 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"NORMAL"   , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TANGENT"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	UINT numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -133,7 +149,8 @@ void Primitive::SetIAStuff()
 
 void Primitive::Render()
 {
-	myTexture->Bind(myDeviceContextPtr, 0);
+	for (auto& t : myTextures)
+		t.myResource.Bind(myDeviceContextPtr, &t.mySlotType);
 
 	UINT strides = sizeof(Vertex);
 	UINT offset = 0;
@@ -203,9 +220,9 @@ void Primitive::Shutdown()
 		myInputLayout = nullptr;
 	}
 
-	if (myTexture)
+	for (auto& t : myTextures)
 	{
-		myTexture->Release();
-		myTexture = nullptr;
+		if (t.myResource.IsLoaded())
+			t.myResource.Release();
 	}
 }

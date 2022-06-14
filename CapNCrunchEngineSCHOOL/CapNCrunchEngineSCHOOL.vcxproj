@@ -164,6 +164,7 @@
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureTypes.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 //cpc
 #include "Primitive.h"
 #include "Vertex.h"
+#include "TextureTypes.h"
 #include "CU/UtilityFunctions.hpp"
 
 namespace
@@ -135,12 +136,10 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	if (!CreateSamplerState())
 		return false;
 
-	//Camera
 	myCamera.Init(CU::Vector3f{ 0.0f, 5.0f, -5.0f }, {45.0f, 45.0f, 0.0f}, 90.0f, CU::Vector2f{ (float)aWidth, (float)aHeight }, 0.01f, 1000.0f);
 
-	//Light
 	myLight.SetDirectionalLight({ 0.5f, -0.5f, 0.0f }, {0.2f, 0.3f, 0.75, 1.0f});
-	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f });
+	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f }); //
 
 	GenerateTerrain();
 
@@ -323,8 +322,20 @@ bool GraphicsEngine::GenerateTerrain()
 	unsigned int* indices = new unsigned int[indexCount];
 	GenerateIndices(indices, indexCount, resolution);
 
+	//Textures
+	const wchar_t* texture[]
+	{
+		L"../../data/textures/Grass_c.png",
+		L"../../data/textures/Rock_c.png",
+		L"../../data/textures/Snow_c.png",
+									  
+		L"../../data/textures/Grass_n.png",
+		L"../../data/textures/Rock_n.png",
+		L"../../data/textures/Snow_n.png"
+	};
+
 	myTerrain = new Primitive(myDevice.Get(), myContext.Get());
-	myTerrain->Init(vertices, heightMap.size(), indices, indexCount, L"tiling_rock.dds");
+	myTerrain->Init(vertices, heightMap.size(), indices, indexCount, texture, std::size(texture));
 	myTerrain->SetPosition({ 0.0f, 0.0f, 0.0f });
 	myTerrain->SetVertexShader(L"ColorVS");
 	myTerrain->SetPixelShader(L"ColorPS");
@@ -339,7 +350,7 @@ bool GraphicsEngine::GenerateTerrain()
 
 void GraphicsEngine::GenerateVertices(Vertex* outVertices, const std::vector<float>& aHeightMap, const float aResolution)
 {
-	float distanceScalar = 0.04f;
+	float distanceScalar = 0.08f;
 	float uvScalar = 20.0f;
 
 	for (size_t i = 0; i < aHeightMap.size(); i++)
@@ -362,27 +373,30 @@ void GraphicsEngine::GenerateNormals(Vertex* outVertices, const size_t amountVer
 {
 	for (size_t i = 0; i < amountVertices; i++)
 	{
-		size_t row    = i / (int)aResolution;
-		size_t column = i % (int)aResolution;
+		const size_t row    = i / (int)aResolution;
+		const size_t column = i % (int)aResolution;
 
 		if (row == aResolution - 1 || column == aResolution - 1)
 			continue;
 		if (row == 0 || column == 0)
 			continue;
 
-		CU::Vector3f above = outVertices[i - (int)aResolution].position;
-		CU::Vector3f below = outVertices[i + (int)aResolution].position;
-		CU::Vector3f right = outVertices[i + 1].position;
-		CU::Vector3f left  = outVertices[i - 1].position;
+		const CU::Vector3f above = outVertices[i - (int)aResolution].position;
+		const CU::Vector3f below = outVertices[i + (int)aResolution].position;
+		const CU::Vector3f right = outVertices[i + 1].position;
+		const CU::Vector3f left  = outVertices[i - 1].position;
 
-		CU::Vector3f vertical = below - above;
-		CU::Vector3f horizontal = right - left;
+		const CU::Vector3f vertical = below - above;
+		const CU::Vector3f horizontal = right - left;
 
-		CU::Vector3f Ncross = (horizontal.Cross(vertical)).GetNormalized();
-
-		outVertices[i].normal.x = Ncross.x;
-		outVertices[i].normal.y = Ncross.y;
-		outVertices[i].normal.z = Ncross.z;
+		const CU::Vector3f Ncross = (horizontal.Cross(vertical)).GetNormalized();
+		memcpy(&outVertices[i].normal, &Ncross, sizeof(CU::Vector3f));
+		
+		
+		const CU::Vector3f crossTanget = outVertices[i].normal.Cross(CU::Vector3f(0.0f, 0.0f, 1.0f)).GetNormalized();
+		const CU::Vector3f crossBitanget = outVertices[i].normal.Cross(CU::Vector3f(1.0f, 0.0f, 0.0f)).GetNormalized();
+		memcpy(&outVertices[i].tangent, &crossTanget, sizeof(CU::Vector3f));
+		memcpy(&outVertices[i].bitangent , &crossBitanget, sizeof(CU::Vector3f));
 	}
 }
 
@@ -424,7 +438,7 @@ void GraphicsEngine::UpdateAndBindBuffers()
 	//Frame Buffer
 	{
 		FrameBuffer frameBufferData = {};
-		auto worldToClip = CU::Matrix4x4f::GetFastInverse(myCamera.GetViewMatrix()) * myCamera.GetProjectionMatrix();
+		auto worldToClip = myCamera.GetViewMatrix() * myCamera.GetProjectionMatrix();
 
 		frameBufferData.worldToClipMatrix = worldToClip;
 		frameBufferData.totalTime = myTimer.GetTotalTime();
@@ -495,7 +509,7 @@ void GraphicsEngine::Update()
 {
 	float t = myTimer.GetTotalTime();
 	float rotSpeed = 0.3f;
-	myLight.SetDirectionalLight({std::sin(t * rotSpeed), std::cos(t * rotSpeed), std::sin(t * (rotSpeed / 2.0f))}, {1.0f, 1.0f, 1.0, 1.0f});
+	myLight.SetDirectionalLight({std::sin(t * rotSpeed), std::cos(t * rotSpeed), 0.0f}, {1.0f, 1.0f, 1.0, 1.0f});
 	myLight.SetAmbientLight({ 1.0f - CU::Clamp(0.1f, 0.8f, CU::Clamp(0.0f, 0.8f, std::sin(t * rotSpeed))), 0.25f, 0.35, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f });
 
 	myTimer.Update();

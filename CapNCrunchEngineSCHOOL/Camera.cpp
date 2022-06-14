@@ -8,8 +8,8 @@ Camera::~Camera() {}
 void Camera::Init(const CU::Vector3f& aPos, const CU::Vector3f& aRot, 
 	const float aFoV, const CU::Vector2f& aRes, const float aNearPlane, const float aFarPlane)
 {
-	myViewMatrix.SetPositionRelative(aPos);
-	myViewMatrix.SetRotation(aRot);
+	myTransform.SetPositionRelative(aPos);
+	myTransform.SetRotation(aRot);
 	SetPerspectiveProjection(aFoV, aRes, aNearPlane, aFarPlane);
 }
 
@@ -42,6 +42,7 @@ void Camera::Update(const float aDT)
 	CU::Vector3f nextPos = {};
 	CU::Vector3f nextRot = {};
 
+
 	if (GetAsyncKeyState('W'))
 		nextPos.z += myMoveSpeed * aDT;
 	if (GetAsyncKeyState('A'))
@@ -62,16 +63,17 @@ void Camera::Update(const float aDT)
 
 	SetPosition(nextPos);
 	SetRotation(nextRot);
+	myViewMatrix = CU::Matrix4x4f::GetFastInverse(myTransform);
 }
 
 void Camera::SetPosition(const CU::Vector3f& aPosition)
 {
-	myViewMatrix = CU::Matrix4x4f::CreateTranslationMatrix(aPosition) * myViewMatrix;
+	myTransform = CU::Matrix4x4f::CreateTranslationMatrix(aPosition) * myTransform;
 }
 
 void Camera::SetRotation(const CU::Vector3f& aRotation)
 {
-	myViewMatrix = CU::Matrix4x4f::CreateRotationAroundX(aRotation.x) * myViewMatrix;
-	myViewMatrix = CU::Matrix4x4f::CreateRotationAroundY(aRotation.y) * myViewMatrix;
-	myViewMatrix = CU::Matrix4x4f::CreateRotationAroundZ(aRotation.z) * myViewMatrix;
+	myTransform = CU::Matrix4x4f::CreateRotationAroundX(aRotation.x) * myTransform;
+	myTransform = CU::Matrix4x4f::CreateRotationAroundY(aRotation.y) * myTransform;
+	myTransform = CU::Matrix4x4f::CreateRotationAroundZ(aRotation.z) * myTransform;
 }

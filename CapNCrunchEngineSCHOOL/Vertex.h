@@ -5,6 +5,8 @@
 struct Vertex
 {
 	CU::Vector3f position;
-	CU::Vector3f normal;
 	CU::Vector2f uv;
+	CU::Vector3f normal;
+	CU::Vector3f tangent;
+	CU::Vector3f bitangent;
 };

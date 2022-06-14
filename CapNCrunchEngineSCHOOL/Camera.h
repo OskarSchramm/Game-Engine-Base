@@ -21,6 +21,7 @@ private:
 	float myNearPlane;
 	float myFarPlane;
 
+	CU::Matrix4x4f myTransform;
 	CU::Matrix4x4f myViewMatrix;
 	CU::Matrix4x4f myProjectionMatrix;
 	float myMoveSpeed;
