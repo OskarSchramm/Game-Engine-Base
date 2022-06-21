@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="CU">
-      <UniqueIdentifier>{3D735900-29FF-870B-92AD-880B7E58880B}</UniqueIdentifier>
-    </Filter>
     <Filter Include="external">
       <UniqueIdentifier>{2839F3DC-1406-4EE8-3D1F-3C90294B8376}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,12 @@
     </Filter>
     <Filter Include="external\directxtex\WICTextureLoader">
       <UniqueIdentifier>{353F7DF1-2126-3FE9-CA76-A506B63CB84F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{76FF3A1C-62A1-65F2-4B5C-7946379DEC42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\CU">
+      <UniqueIdentifier>{9D2410F6-098F-C46C-52CD-7512BE76A2C1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -114,45 +117,63 @@
     <ClInclude Include="..\external\directxtex\WICTextureLoader\WICTextureLoader9.h">
       <Filter>external\directxtex\WICTextureLoader</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Input.h">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Input.h">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Matrix3x3.hpp">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Matrix3x3.hpp">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Matrix4x4.hpp">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Matrix4x4.hpp">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Quaternion.h">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Quaternion.h">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Random.hpp">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Random.hpp">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Timer.h">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Timer.h">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\UtilityFunctions.hpp">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\UtilityFunctions.hpp">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Vector2.hpp">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Vector2.hpp">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Vector3.hpp">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Vector3.hpp">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="CU\Vector4.hpp">
-      <Filter>CU</Filter>
+    <ClInclude Include="..\source\CU\Vector4.hpp">
+      <Filter>source\CU</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="GraphicsEngine.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Primitive.h" />
-    <ClInclude Include="RenderTarget.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="TextureTypes.h" />
-    <ClInclude Include="Vertex.h" />
-    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="..\source\Camera.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\GraphicsEngine.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Light.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Primitive.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\RenderTarget.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Texture.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\TextureTypes.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Vertex.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\stb_image.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader11.cpp">
@@ -266,18 +287,30 @@
     <ClCompile Include="..\external\directxtex\WICTextureLoader\WICTextureLoader9.cpp">
       <Filter>external\directxtex\WICTextureLoader</Filter>
     </ClCompile>
-    <ClCompile Include="CU\Input.cpp">
-      <Filter>CU</Filter>
+    <ClCompile Include="..\source\CU\Input.cpp">
+      <Filter>source\CU</Filter>
     </ClCompile>
-    <ClCompile Include="CU\Random.cpp">
-      <Filter>CU</Filter>
+    <ClCompile Include="..\source\CU\Random.cpp">
+      <Filter>source\CU</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="GraphicsEngine.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="Primitive.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\source\Camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\GraphicsEngine.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Light.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Primitive.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Texture.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\external\directxtex\DirectXTex\Shaders\BC6HEncode.hlsl">
@@ -286,13 +319,25 @@
     <FxCompile Include="..\external\directxtex\DirectXTex\Shaders\BC7Encode.hlsl">
       <Filter>external\directxtex\DirectXTex\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="color_PS.hlsl" />
-    <FxCompile Include="color_VS.hlsl" />
+    <FxCompile Include="..\source\color_PS.hlsl">
+      <Filter>source</Filter>
+    </FxCompile>
+    <FxCompile Include="..\source\color_VS.hlsl">
+      <Filter>source</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommonFunctions.hlsli" />
-    <None Include="PBRFunctions.hlsli" />
-    <None Include="ShaderCommon.hlsli" />
-    <None Include="ShaderStructs.hlsli" />
+    <None Include="..\source\CommonFunctions.hlsli">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\source\PBRFunctions.hlsli">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\source\ShaderCommon.hlsli">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\source\ShaderStructs.hlsli">
+      <Filter>source</Filter>
+    </None>
   </ItemGroup>
 </Project>

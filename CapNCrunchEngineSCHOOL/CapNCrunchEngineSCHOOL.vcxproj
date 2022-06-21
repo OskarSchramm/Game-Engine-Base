@@ -54,22 +54,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\bin\Debug-windows-x86_64\CapNCrunchEngineSCHOOL\</OutDir>
-    <IntDir>..\bin-int\Debug-windows-x86_64\CapNCrunchEngineSCHOOL\</IntDir>
+    <OutDir>..\bin\Debug\</OutDir>
+    <IntDir>..\temp\Debug\</IntDir>
     <TargetName>CapNCrunchEngineSCHOOL_Debug</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\bin\Release-windows-x86_64\CapNCrunchEngineSCHOOL\</OutDir>
-    <IntDir>..\bin-int\Release-windows-x86_64\CapNCrunchEngineSCHOOL\</IntDir>
+    <OutDir>..\bin\Release\</OutDir>
+    <IntDir>..\temp\Release\</IntDir>
     <TargetName>CapNCrunchEngineSCHOOL_Release</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Distribution|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\bin\Distribution-windows-x86_64\CapNCrunchEngineSCHOOL\</OutDir>
-    <IntDir>..\bin-int\Distribution-windows-x86_64\CapNCrunchEngineSCHOOL\</IntDir>
+    <OutDir>..\bin\Distribution\</OutDir>
+    <IntDir>..\temp\Distribution\</IntDir>
     <TargetName>CapNCrunchEngineSCHOOL_Distribution</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
@@ -78,6 +78,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -93,6 +94,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -112,6 +114,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -151,25 +154,25 @@
     <ClInclude Include="..\external\directxtex\WICTextureLoader\WICTextureLoader11.h" />
     <ClInclude Include="..\external\directxtex\WICTextureLoader\WICTextureLoader12.h" />
     <ClInclude Include="..\external\directxtex\WICTextureLoader\WICTextureLoader9.h" />
-    <ClInclude Include="CU\Input.h" />
-    <ClInclude Include="CU\Matrix3x3.hpp" />
-    <ClInclude Include="CU\Matrix4x4.hpp" />
-    <ClInclude Include="CU\Quaternion.h" />
-    <ClInclude Include="CU\Random.hpp" />
-    <ClInclude Include="CU\Timer.h" />
-    <ClInclude Include="CU\UtilityFunctions.hpp" />
-    <ClInclude Include="CU\Vector2.hpp" />
-    <ClInclude Include="CU\Vector3.hpp" />
-    <ClInclude Include="CU\Vector4.hpp" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="GraphicsEngine.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Primitive.h" />
-    <ClInclude Include="RenderTarget.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="TextureTypes.h" />
-    <ClInclude Include="Vertex.h" />
-    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="..\source\CU\Input.h" />
+    <ClInclude Include="..\source\CU\Matrix3x3.hpp" />
+    <ClInclude Include="..\source\CU\Matrix4x4.hpp" />
+    <ClInclude Include="..\source\CU\Quaternion.h" />
+    <ClInclude Include="..\source\CU\Random.hpp" />
+    <ClInclude Include="..\source\CU\Timer.h" />
+    <ClInclude Include="..\source\CU\UtilityFunctions.hpp" />
+    <ClInclude Include="..\source\CU\Vector2.hpp" />
+    <ClInclude Include="..\source\CU\Vector3.hpp" />
+    <ClInclude Include="..\source\CU\Vector4.hpp" />
+    <ClInclude Include="..\source\Camera.h" />
+    <ClInclude Include="..\source\GraphicsEngine.h" />
+    <ClInclude Include="..\source\Light.h" />
+    <ClInclude Include="..\source\Primitive.h" />
+    <ClInclude Include="..\source\RenderTarget.h" />
+    <ClInclude Include="..\source\Texture.h" />
+    <ClInclude Include="..\source\TextureTypes.h" />
+    <ClInclude Include="..\source\Vertex.h" />
+    <ClInclude Include="..\source\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\external\directxtex\DDSTextureLoader\DDSTextureLoader11.cpp" />
@@ -209,32 +212,34 @@
     <ClCompile Include="..\external\directxtex\WICTextureLoader\WICTextureLoader11.cpp" />
     <ClCompile Include="..\external\directxtex\WICTextureLoader\WICTextureLoader12.cpp" />
     <ClCompile Include="..\external\directxtex\WICTextureLoader\WICTextureLoader9.cpp" />
-    <ClCompile Include="CU\Input.cpp" />
-    <ClCompile Include="CU\Random.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="GraphicsEngine.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="Primitive.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\source\CU\Input.cpp" />
+    <ClCompile Include="..\source\CU\Random.cpp" />
+    <ClCompile Include="..\source\Camera.cpp" />
+    <ClCompile Include="..\source\GraphicsEngine.cpp" />
+    <ClCompile Include="..\source\Light.cpp" />
+    <ClCompile Include="..\source\Primitive.cpp" />
+    <ClCompile Include="..\source\Texture.cpp" />
+    <ClCompile Include="..\source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\external\directxtex\DirectXTex\Shaders\BC6HEncode.hlsl" />
     <FxCompile Include="..\external\directxtex\DirectXTex\Shaders\BC7Encode.hlsl" />
-    <FxCompile Include="color_PS.hlsl">
+    <FxCompile Include="..\source\color_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
+      <ObjectFileOutput>../bin/shaders/color_PS.cso</ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="color_VS.hlsl">
+    <FxCompile Include="..\source\color_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
+      <ObjectFileOutput>../bin/shaders/color_VS.cso</ObjectFileOutput>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommonFunctions.hlsli" />
-    <None Include="PBRFunctions.hlsli" />
-    <None Include="ShaderCommon.hlsli" />
-    <None Include="ShaderStructs.hlsli" />
+    <None Include="..\source\CommonFunctions.hlsli" />
+    <None Include="..\source\PBRFunctions.hlsli" />
+    <None Include="..\source\ShaderCommon.hlsli" />
+    <None Include="..\source\ShaderStructs.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

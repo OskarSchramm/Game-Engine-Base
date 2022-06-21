@@ -9,7 +9,7 @@ workspace "CapNCrunchEngineSCHOOL"
 		"Distribution"
 	}
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+output = "%{cfg.buildcfg}"
 
 project "CapNCrunchEngineSCHOOL"
 	location "CapNCrunchEngineSCHOOL"
@@ -17,10 +17,10 @@ project "CapNCrunchEngineSCHOOL"
 	language "C++"
 	cppdialect "C++17"
 
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir("bin-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("bin/" .. output)
+	objdir("temp/" .. output)
 	targetname("%{prj.name}_%{cfg.buildcfg}")
-	debugdir (outputdir)
+	debugdir ("bin/")
 
 	files {
 		"**.h",
@@ -34,6 +34,16 @@ project "CapNCrunchEngineSCHOOL"
 		"external/"
 	}
 
+	filter("files:**_PS.hlsl")
+		shadermodel("5.0")
+		shadertype("Pixel")
+		shaderobjectfileoutput("../bin/shaders/".."%{file.basename}"..".cso")
+
+   filter("files:**_VS.hlsl")
+		shadermodel("5.0")
+		shadertype("Vertex")
+		shaderobjectfileoutput("../bin/shaders/".."%{file.basename}"..".cso")
+
 	filter "configurations:Debug"
 		defines "_DEBUG"
 		runtime "Debug"
@@ -46,11 +56,3 @@ project "CapNCrunchEngineSCHOOL"
 		defines "_DIST"
 		runtime "Release"
 		optimize "on"
-
-	filter("files:**_PS.hlsl")
-		shadermodel("5.0")
-		shadertype("Pixel")
-
-   filter("files:**_VS.hlsl")
-		shadermodel("5.0")
-		shadertype("Vertex")

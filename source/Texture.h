@@ -1,6 +1,6 @@
 #pragma once
 #pragma comment( lib, "dxguid.lib")
-#include <DDSTextureLoader/DDSTextureLoader11.h>
+#include "directxtex/DDSTextureLoader/DDSTextureLoader11.h"
 #include "CU/Vector2.hpp"
 
 struct ID3D11Device;

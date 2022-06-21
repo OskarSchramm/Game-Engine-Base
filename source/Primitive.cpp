@@ -90,12 +90,12 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 	shaderFilenameCso = shaderFilenameCso + L".cso";
 	shaderFilenameHlsl = shaderFilenameHlsl + L".hlsl";
 	res = D3DReadFileToBlob(shaderFilenameCso.c_str(), &myVertexBlob);
-	if (FAILED(res))
-	{
-		res = D3DCompileFromFile(shaderFilenameHlsl.c_str(), NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &myVertexBlob, nullptr);
-		if (FAILED(res))
-			return false;
-	}
+	//if (FAILED(res))
+	//{
+	//	res = D3DCompileFromFile(shaderFilenameHlsl.c_str(), NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &myVertexBlob, nullptr);
+	//	if (FAILED(res))
+	//		return false;
+	//}
 
 	res = myDevicePtr->CreateVertexShader(myVertexBlob->GetBufferPointer(), myVertexBlob->GetBufferSize(), nullptr, &myVertexShader);
 	if (FAILED(res))
@@ -134,12 +134,12 @@ bool Primitive::SetPixelShader(const LPCWSTR aShaderFilename)
 	shaderFilenameCso = shaderFilenameCso + L".cso";
 	shaderFilenameHlsl = shaderFilenameHlsl + L".hlsl";
 	res = D3DReadFileToBlob(shaderFilenameCso.c_str(), &myPixelBlob);
-	if (FAILED(res))
-	{
-		res = D3DCompileFromFile(shaderFilenameHlsl.c_str(), NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &myPixelBlob, nullptr);
-		if (FAILED(res))
-			return false;
-	}
+	//if (FAILED(res))
+	//{
+	//	res = D3DCompileFromFile(shaderFilenameHlsl.c_str(), NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &myPixelBlob, nullptr);
+	//	if (FAILED(res))
+	//		return false;
+	//}
 
 	res = myDevicePtr->CreatePixelShader(myPixelBlob->GetBufferPointer(), myPixelBlob->GetBufferSize(), nullptr, &myPixelShader);
 	if (FAILED(res))
