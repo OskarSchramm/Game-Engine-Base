@@ -139,11 +139,30 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	myLight.SetDirectionalLight({ 0.5f, -0.5f, 0.0f }, {0.1f, 0.1f, 0.1, 0.5f});
 	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25f, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f }); 
 
-	myCubeMap.Init(myDevice.Get(), myContext.Get(), L"../../data/textures/cube_1024_preblurred_angle3_Skansen3.dds");
+	myCubeMap.Init(myDevice.Get(), myContext.Get(), L"bin/data/textures/cube_1024_preblurred_angle3_Skansen3.dds");
 	myCubeMap.BindPS(myContext.Get(), TextureType::CubeMap);
 
 	GenerateTerrain();
+
+	CreateWaterRenderTarget(aWidth, aHeight);
+	CreateFFCRasterizer();
 	GeneratePlane(20, myWaterHeight);
+
+	D3D11_MAPPED_SUBRESOURCE mappedCBuffer = {};
+	ZeroMemory(&mappedCBuffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//SettingsBuffer
+	{
+		mySettingsData.myResolutionHeight = aWidth;
+		mySettingsData.myResolutionWidth  = aHeight;
+		mySettingsData.myClipPlaneHeight = 0; //IDK why
+		mySettingsData.padding = 0;
+
+		myContext->Map(mySettingsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCBuffer);
+		memcpy(mappedCBuffer.pData, &mySettingsData, sizeof(SettingsBuffer));
+		myContext->Unmap(mySettingsBuffer, 0);
+		myContext->PSSetConstantBuffers(3, 1, &mySettingsBuffer);
+		myContext->VSSetConstantBuffers(3, 1, &mySettingsBuffer);
+	}
 
 	return true;
 }
@@ -275,6 +294,12 @@ bool GraphicsEngine::CreateConstantBuffers()
 	if (FAILED(result))
 		return false;
 
+	//SettingsBuffer
+	bufferDesc.ByteWidth = sizeof(SettingsBuffer);
+	result = myDevice->CreateBuffer(&bufferDesc, nullptr, &mySettingsBuffer);
+	if (FAILED(result))
+		return false;
+
 	return true;
 }
 
@@ -297,46 +322,57 @@ bool GraphicsEngine::CreateSamplerState()
 	if (FAILED(result))
 		return false;
 
+	myContext->PSSetSamplers(0, 1, &mySampleState);
+
 	return true;
 }
 
-bool GraphicsEngine::CreateWaterRenderTarget()
+bool GraphicsEngine::CreateWaterRenderTarget(const float aWidth, const float aHeight)
 {
-	//HRESULT result;
+	HRESULT result;
 
-	//D3D11_DEPTH_STENCIL_VIEW_DESC depthDesc;
-	//myDepthBuffer->GetDesc(&depthDesc);
-	//
-	//D3D11_TEXTURE2D_DESC textureDesc;
-	//myDepthBuffer->GetDesc()
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = aWidth;
+	desc.Height = aHeight;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
 
-	//D3D11_TEXTURE2D_DESC desc = {};
-	//desc.Width = textureDesc.Width;
-	//desc.Height = textureDesc.Height;
-	//desc.MipLevels = 1;
-	//desc.ArraySize = 1;
-	//desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	//desc.SampleDesc.Count = 1;
-	//desc.SampleDesc.Quality = 0;
-	//desc.Usage = D3D11_USAGE_DEFAULT;
-	//desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	//desc.CPUAccessFlags = 0;
-	//desc.MiscFlags = 0;
+	ID3D11Texture2D* texture = nullptr;
+	result = myDevice->CreateTexture2D(&desc, nullptr, &texture);
+	if (FAILED(result))
+		return false;
 
-	//ID3D11Texture2D* texture = nullptr;
-	//result = myDevice->CreateTexture2D(&desc, nullptr, &texture);
-	//if (FAILED(result))
-	//	return false;
+	result = myDevice->CreateShaderResourceView(texture, nullptr, &myWaterReflectionRenderTarget.myShaderResource);
+	if (FAILED(result))
+		return false;
 
-	//result = myDevice->CreateShaderResourceView(texture, nullptr, &myWaterReflectionRenderTarget.myShaderResource);
-	//if (FAILED(result))
-	//	return false;
+	result = myDevice->CreateRenderTargetView(texture, nullptr, &myWaterReflectionRenderTarget.myRenderTargetView);
 
-	//result = myDevice->CreateRenderTargetView(texture, nullptr, &myWaterReflectionRenderTarget.myRenderTargetView);
+	texture->Release();
 
-	//texture->Release();
+	myContext->PSSetShaderResources(10, 1, &myWaterReflectionRenderTarget.myShaderResource);
 
-	//myContext->PSSetShaderResources(0, 1, &myWaterReflectionRenderTarget.myShaderResource);
+	return true;
+}
+
+bool GraphicsEngine::CreateFFCRasterizer()
+{
+	HRESULT result;
+
+	D3D11_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.CullMode = D3D11_CULL_FRONT;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+
+	result = myDevice->CreateRasterizerState(&rasterDesc, &myFFCRasterState);
+	if (FAILED(result))
+		return false;
 
 	return true;
 }
@@ -366,7 +402,9 @@ bool GraphicsEngine::GeneratePlane(const float aSize, const float aHeightPositio
 	myWaterPlane->Init(vertices, 4, indices, std::size(indices));
 	myWaterPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
 	myWaterPlane->SetVertexShader(L"ColorVS");
-	myWaterPlane->SetPixelShader(L"ColorPS");
+	myWaterPlane->SetPixelShader(L"WaterPS");
+
+	myWaterPlane->AddTexture(myWaterReflectionRenderTarget.myShaderResource, 10);
 
 	return true;
 }
@@ -401,17 +439,17 @@ bool GraphicsEngine::GenerateTerrain()
 	//Textures
 	const wchar_t* texture[]
 	{
-		L"../../data/textures/Grass_c.png",
-		L"../../data/textures/Rock_c.png",
-		L"../../data/textures/Snow_c.png",
-									  
-		L"../../data/textures/Grass_n.png",
-		L"../../data/textures/Rock_n.png",
-		L"../../data/textures/Snow_n.png",
-
-		L"../../data/textures/Grass_m.png",
-		L"../../data/textures/Rock_m.png",
-		L"../../data/textures/Snow_m.png",
+		L"bin/data/textures/Grass_c.png",
+		L"bin/data/textures/Rock_c.png",
+		L"bin/data/textures/Snow_c.png",
+			  
+		L"bin/data/textures/Grass_n.png",
+		L"bin/data/textures/Rock_n.png",
+		L"bin/data/textures/Snow_n.png",
+		  
+		L"bin/data/textures/Grass_m.png",
+		L"bin/data/textures/Rock_m.png",
+		L"bin/data/textures/Snow_m.png",
 	};
 
 	myTerrain = new Primitive(myDevice.Get(), myContext.Get());
@@ -557,30 +595,54 @@ void GraphicsEngine::UpdateAndBindBuffers()
 
 void GraphicsEngine::Render()
 {
-	constexpr float color[4] = { 0.97f, 0.59f, 0.38f, 1.0f };
-	myContext->ClearRenderTargetView(myBackBuffer.Get(), color);
-	myContext->ClearDepthStencilView(myDepthBuffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	myContext->PSSetSamplers(0, 1, &mySampleState);
-
 	//Render to texture upside down
 	RenderWaterToTexture();
 
+	SetRenderTargets(myBackBuffer.GetAddressOf(), nullptr);
 	UpdateAndBindBuffers();
 	RenderPrimitive(myTerrain);
 
-	RenderPrimitive(myWaterPlane); //With the appropriate texutre
+	//Render Water
+	RenderPrimitive(myWaterPlane);
 
 	mySwapChain->Present(1, 0);
 }
 
 void GraphicsEngine::RenderWaterToTexture()
 {
-	//myCamera.SetRotation({ 0.0f, 0.0f, 180.0f });
+	SetRenderTargets(&myWaterReflectionRenderTarget.myRenderTargetView, myFFCRasterState);
 
-	myTerrain->GetModelMatrix()(1, 1) = myTerrain->GetModelMatrix()(1, 1) * -1;
-	myTerrain->GetModelMatrix()(1, 3) = 2 * -myWaterHeight;
+	D3D11_MAPPED_SUBRESOURCE mappedCBuffer = {};
 
-	mySwapChain->Present(1, 0);
+	//EXTRA LEFT HERE!!!
+	//Frame Buffer
+	{
+		FrameBuffer frameBufferData = {};
+		auto worldToClip = myCamera.GetReflectionMatrix(myWaterHeight);
+
+		frameBufferData.worldToClipMatrix = worldToClip;
+		frameBufferData.totalTime = myTimer.GetTotalTime();
+		frameBufferData.cameraPos = myCamera.GetTransform().GetPosition();
+
+		myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCBuffer);
+		memcpy(mappedCBuffer.pData, &frameBufferData, sizeof(FrameBuffer));
+		myContext->Unmap(myFrameBuffer, 0);
+		myContext->VSSetConstantBuffers(0, 1, &myFrameBuffer);
+		myContext->PSSetConstantBuffers(0, 1, &myFrameBuffer);
+	}
+
+	UpdateAndBindBuffers();
+	RenderPrimitive(myTerrain);
+}
+
+void GraphicsEngine::SetRenderTargets(ID3D11RenderTargetView** aRenderTarget, ID3D11RasterizerState* aRasterState)
+{
+	constexpr float color[4] = { 0.97f, 0.59f, 0.38f, 1.0f };
+
+	myContext->OMSetRenderTargets(1, aRenderTarget, myDepthBuffer);
+	myContext->ClearRenderTargetView(*aRenderTarget, color);
+	myContext->ClearDepthStencilView(myDepthBuffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	myContext->RSSetState(aRasterState);
 }
 
 void GraphicsEngine::RenderPrimitive(Primitive* aPrimitive)

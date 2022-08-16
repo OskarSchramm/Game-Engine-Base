@@ -52,6 +52,14 @@ class GraphicsEngine
 		float padding;
 	};
 
+	struct SettingsBuffer
+	{
+		float myResolutionWidth;
+		float myResolutionHeight;
+		float myClipPlaneHeight;
+		float padding;
+	};
+
 public:
 	GraphicsEngine();
 	~GraphicsEngine();
@@ -68,9 +76,11 @@ private:
 	void UpdateAndBindBuffers();
 
 	//ADDED
-	bool CreateWaterRenderTarget();
+	bool CreateWaterRenderTarget(const float aWidth, const float aHeight);
+	bool CreateFFCRasterizer();
 	bool GeneratePlane(const float aSize, const float aHeightPosition);
 	void RenderWaterToTexture();
+	void SetRenderTargets(ID3D11RenderTargetView** aRenderTarget, ID3D11RasterizerState* aRasterState);
 
 	bool GenerateTerrain();
 	void GenerateVertices(Vertex* outVertices, const std::vector<float>& aHeightMap, const float aResolution);
@@ -90,17 +100,21 @@ private:
 
 	ID3D11Buffer*				   myFrameBuffer;
 	ID3D11Buffer*                  myObjectBuffer;
-	ID3D11Buffer*                  myLightBuffer;
+	ID3D11Buffer*			       myLightBuffer;
+	ID3D11Buffer*                  mySettingsBuffer;
 
-	Primitive* myTerrain;
+	SettingsBuffer				   mySettingsData;
 
 	const float myWaterHeight = -0.25f;
 	Primitive* myWaterPlane;
 	RenderTarget myWaterReflectionRenderTarget;
+	ID3D11RasterizerState* myFFCRasterState;
 
 	Texture    myCubeMap;
 	Light	   myLight;
 
 	Camera	   myCamera;
 	CU::Timer  myTimer;
+
+	Primitive* myTerrain;
 };

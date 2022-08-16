@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="external">
+      <UniqueIdentifier>{c4db1762-1775-4deb-ad48-977fd742b1b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{047c4872-627c-42f5-be00-7d6f0edda51a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header">
+      <UniqueIdentifier>{2b2f4257-c717-4387-8acb-d16263a82d90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{265c05bd-f819-4fe6-81a1-017342b97024}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="source\shaders\ColorPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="source\shaders\ColorVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="source\shaders\WaterPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\Camera.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\GraphicsEngine.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Light.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Primitive.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RenderTarget.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Texture.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\TextureTypes.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Vertex.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="source\stb_image.h">
+      <Filter>external</Filter>
+    </ClInclude>
+    <ClInclude Include="external\directxtex\DDSTextureLoader\DDSTextureLoader11.h">
+      <Filter>header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\Camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GraphicsEngine.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Light.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Primitive.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Texture.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="external\directxtex\DDSTextureLoader\DDSTextureLoader11.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\shaders\CommonFunctions.hlsli">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="source\shaders\PBRFunctions.hlsli">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="source\shaders\ShaderCommon.hlsli">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="source\shaders\ShaderStructs.hlsli">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

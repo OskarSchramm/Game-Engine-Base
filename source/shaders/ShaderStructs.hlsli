@@ -15,6 +15,7 @@ struct PixelInputType
     float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
     float3 worldPosition : WORLDPOSITION;
+    float clip : SV_ClipDistance;
 };
 
 struct PixelOutput

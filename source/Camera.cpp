@@ -77,3 +77,11 @@ void Camera::SetRotation(const CU::Vector3f& aRotation)
 	myTransform = CU::Matrix4x4f::CreateRotationAroundY(aRotation.y) * myTransform;
 	myTransform = CU::Matrix4x4f::CreateRotationAroundZ(aRotation.z) * myTransform;
 }
+
+CU::Matrix4x4f Camera::GetReflectionMatrix(const float h)
+{
+	CU::Matrix4x4f hMatrix;
+	hMatrix(2, 2) = -1;
+	hMatrix(4, 2) = -2 * h;
+	return hMatrix * (myViewMatrix * myProjectionMatrix);
+}

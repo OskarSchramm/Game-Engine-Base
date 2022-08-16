@@ -34,3 +34,11 @@ cbuffer LightBuffer : register(b2)
     float3 directionalLightDir;
     float padding0;
 }
+
+cbuffer SettingsBuffer : register(b3)
+{
+    float aResolutionWidth;
+    float aResolutionHeight;
+    float waterHeight;
+    float padding;
+}
