@@ -17,6 +17,7 @@ SamplerState sampleState : register(s0);
 cbuffer FrameBuffer : register(b0)
 {
     float4x4 modelToClipMatrix;
+    float4x4 cameraMatrix;
     float3 cameraPosition;
     float totalTime;
 };

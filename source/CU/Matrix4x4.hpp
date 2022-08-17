@@ -32,6 +32,18 @@ namespace CU
 			myRows[3].y = aVector3.y;
 			myRows[3].z = aVector3.z;
 		}
+		void SetScale(const Vector3<T>& aVector3)
+		{
+			myRows[0].x = aVector3.x;
+			myRows[1].y = aVector3.y;
+			myRows[2].z = aVector3.z;
+		}
+		void SetScale(const float aScale)
+		{
+			myRows[0].x = aScale;
+			myRows[1].y = aScale;
+			myRows[2].z = aScale;
+		}
 
 		static Matrix4x4<T> CreateTranslationMatrix(const Vector3<T>& aVector3)
 		{

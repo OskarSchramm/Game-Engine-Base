@@ -36,6 +36,7 @@ class GraphicsEngine
 	struct FrameBuffer
 	{
 		CU::Matrix4x4f worldToClipMatrix;
+		CU::Matrix4x4f cameraMatrix;
 		CU::Vector3f cameraPos;
 		float totalTime;
 	};
@@ -79,6 +80,7 @@ private:
 	bool CreateWaterRenderTarget(const float aWidth, const float aHeight);
 	bool CreateFFCRasterizer();
 	bool GeneratePlane(const float aSize, const float aHeightPosition);
+	void UpdateSettingsBuffer(const float aWidth, const float aHeight);
 	void RenderWaterToTexture();
 	void SetRenderTargets(ID3D11RenderTargetView** aRenderTarget, ID3D11RasterizerState* aRasterState);
 
@@ -105,11 +107,11 @@ private:
 
 	SettingsBuffer				   mySettingsData;
 
-	const float myWaterHeight = -0.25f;
+	const float myWaterHeight = 0.0f; //-0.25
 	Primitive* myWaterPlane;
 	RenderTarget myWaterReflectionRenderTarget;
 	ID3D11RasterizerState* myFFCRasterState;
-
+	
 	Texture    myCubeMap;
 	Light	   myLight;
 

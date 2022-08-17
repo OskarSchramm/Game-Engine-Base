@@ -29,7 +29,7 @@ PixelInputType main(VertexInputType input)
     output.bitangent = normalize(vertexWorldBitangent);
     
     output.uv = input.uv;
-    output.clip = waterHeight;
+    output.clip = worldPos.y - waterHeight;
     
     return output;
 }

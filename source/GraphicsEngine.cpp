@@ -148,13 +148,20 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	CreateFFCRasterizer();
 	GeneratePlane(20, myWaterHeight);
 
+	UpdateSettingsBuffer(aWidth, aHeight);
+
+	return true;
+}
+
+void GraphicsEngine::UpdateSettingsBuffer(const float aWidth, const float aHeight)
+{
 	D3D11_MAPPED_SUBRESOURCE mappedCBuffer = {};
 	ZeroMemory(&mappedCBuffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	//SettingsBuffer
 	{
 		mySettingsData.myResolutionHeight = aWidth;
-		mySettingsData.myResolutionWidth  = aHeight;
-		mySettingsData.myClipPlaneHeight = 0; //IDK why
+		mySettingsData.myResolutionWidth = aHeight;
+		mySettingsData.myClipPlaneHeight = myWaterHeight;
 		mySettingsData.padding = 0;
 
 		myContext->Map(mySettingsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCBuffer);
@@ -163,8 +170,6 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 		myContext->PSSetConstantBuffers(3, 1, &mySettingsBuffer);
 		myContext->VSSetConstantBuffers(3, 1, &mySettingsBuffer);
 	}
-
-	return true;
 }
 
 bool GraphicsEngine::CreateDeviceAndSwapChain(HWND* aWindowHandle)
@@ -379,28 +384,32 @@ bool GraphicsEngine::CreateFFCRasterizer()
 
 bool GraphicsEngine::GeneratePlane(const float aSize, const float aHeightPosition)
 {
-	CU::Vector3f position;
-	CU::Vector2f uv;
-	CU::Vector3f normal;
-	CU::Vector3f tangent;
-	CU::Vector3f bitangent;
 	Vertex vertices[]
 	{
-		CU::Vector3f{0.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-		CU::Vector3f{0.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-		CU::Vector3f{1.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-		CU::Vector3f{1.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		CU::Vector3f{-0.5f, aHeightPosition,  0.5f}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		CU::Vector3f{ 0.5f, aHeightPosition,  0.5f}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		CU::Vector3f{-0.5f, aHeightPosition, -0.5f}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		CU::Vector3f{ 0.5f, aHeightPosition, -0.5f}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
 	};
+
+	//Vertex vertices[]
+	//{
+	//	CU::Vector3f{0.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+	//	CU::Vector3f{0.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+	//	CU::Vector3f{1.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+	//	CU::Vector3f{1.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+	//};
 
 	unsigned int indices[]
 	{
-		0, 1, 3,
-		3, 2, 0
+		0, 1, 2,
+		1, 3, 2
 	};
 
 	myWaterPlane = new Primitive(myDevice.Get(), myContext.Get());
 	myWaterPlane->Init(vertices, 4, indices, std::size(indices));
-	myWaterPlane->SetPosition({ 0.0f, 0.0f, 0.0f });
+	myWaterPlane->SetPosition({ 0.5f * aSize, 0.0, 0.5f * aSize });
+	myWaterPlane->GetModelMatrix().SetScale({aSize, 0.0f, aSize });
 	myWaterPlane->SetVertexShader(L"ColorVS");
 	myWaterPlane->SetPixelShader(L"WaterPS");
 
@@ -559,6 +568,7 @@ void GraphicsEngine::UpdateAndBindBuffers()
 		auto worldToClip = myCamera.GetViewMatrix() * myCamera.GetProjectionMatrix();
 
 		frameBufferData.worldToClipMatrix = worldToClip;
+		frameBufferData.cameraMatrix = myCamera.GetTransform();
 		frameBufferData.totalTime = myTimer.GetTotalTime();
 		frameBufferData.cameraPos = myCamera.GetTransform().GetPosition();
 
@@ -600,10 +610,10 @@ void GraphicsEngine::Render()
 
 	SetRenderTargets(myBackBuffer.GetAddressOf(), nullptr);
 	UpdateAndBindBuffers();
-	RenderPrimitive(myTerrain);
 
-	//Render Water
 	RenderPrimitive(myWaterPlane);
+
+	RenderPrimitive(myTerrain);
 
 	mySwapChain->Present(1, 0);
 }
@@ -613,14 +623,12 @@ void GraphicsEngine::RenderWaterToTexture()
 	SetRenderTargets(&myWaterReflectionRenderTarget.myRenderTargetView, myFFCRasterState);
 
 	D3D11_MAPPED_SUBRESOURCE mappedCBuffer = {};
-
-	//EXTRA LEFT HERE!!!
-	//Frame Buffer
 	{
 		FrameBuffer frameBufferData = {};
 		auto worldToClip = myCamera.GetReflectionMatrix(myWaterHeight);
 
 		frameBufferData.worldToClipMatrix = worldToClip;
+		frameBufferData.cameraMatrix = myCamera.GetTransform();
 		frameBufferData.totalTime = myTimer.GetTotalTime();
 		frameBufferData.cameraPos = myCamera.GetTransform().GetPosition();
 
@@ -631,7 +639,6 @@ void GraphicsEngine::RenderWaterToTexture()
 		myContext->PSSetConstantBuffers(0, 1, &myFrameBuffer);
 	}
 
-	UpdateAndBindBuffers();
 	RenderPrimitive(myTerrain);
 }
 
