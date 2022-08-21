@@ -16,6 +16,7 @@
 #include "RenderTarget.h"
 
 using Microsoft::WRL::ComPtr;
+typedef unsigned int uint;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -29,7 +30,6 @@ struct ID3D11DepthStencilState;
 
 struct Vertex;
 class Primitive;
-
 
 class GraphicsEngine
 {
@@ -88,6 +88,10 @@ private:
 	void GenerateVertices(Vertex* outVertices, const std::vector<float>& aHeightMap, const float aResolution);
 	void GenerateNormals(Vertex* outVertices, const size_t amountVertices, const float aResolution);
 	void GenerateIndices(unsigned int* outIndices, const size_t indexCount, const float aResolution);
+
+	void GenerateLMCoords(Vertex* outVertices, const size_t amountVertices, const float aResolution);
+	bool CalculateLightMap(const float aWidth, const float aHeight);
+	void RenderLightmap();
 	
 	void RenderPrimitive(Primitive* aPrimitive);
 
@@ -107,10 +111,19 @@ private:
 
 	SettingsBuffer				   mySettingsData;
 
-	const float myWaterHeight = 0.0f; //-0.25
+	//Water
+	const float myWaterHeight = -0.14f;
 	Primitive* myWaterPlane;
-	RenderTarget myWaterReflectionRenderTarget;
+	RenderTarget myWaterReflectionRT;
 	ID3D11RasterizerState* myFFCRasterState;
+
+	//LightMap
+	RenderTarget myTerrainPropertiesRT;
+	RenderTarget myLightMapRT;
+	Primitive* myExtraPlane;
+	Texture    myNoiseTexture;
+	uint  myLMWidth;
+	uint  myLMHeight;
 	
 	Texture    myCubeMap;
 	Light	   myLight;

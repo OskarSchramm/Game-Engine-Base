@@ -46,7 +46,7 @@ bool Primitive::Init(Vertex* vertices, UINT aVertexCount, UINT* indices, UINT aI
 		}
 		auto texture = someTexturePaths[i];
 		auto& itr = myTextures.emplace_back(i);
-		itr.myResource.Init(myDevicePtr, myDeviceContextPtr, texture, true, albedoTexture, true); //Changed
+		itr.myResource.Init(myDevicePtr, myDeviceContextPtr, texture, true, albedoTexture, true);
 	}
 }
 
@@ -105,10 +105,11 @@ bool Primitive::SetVertexShader(const LPCWSTR aShaderFilename)
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[] =
 	{
 		{"POSITION" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD" , 0, DXGI_FORMAT_R32G32_FLOAT   , 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT   , 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{"NORMAL"   , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TANGENT"  , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"LMCOORD", 0, DXGI_FORMAT_R32G32_FLOAT   , 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	UINT numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);

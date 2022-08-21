@@ -10,8 +10,10 @@ PixelOutput main(PixelInputType input)
     PixelOutput result;
         
     float4x4 cameraTranspose = transpose(cameraMatrix);
-    float3 toEye = cameraTranspose[3].xyz - input.worldPosition.xyz;
+    //float3 toEye = cameraTranspose[3].xyz - input.worldPosition.xyz;
+    float3 toEye = cameraPosition.xyz - input.worldPosition.xyz;
     float dist = abs(dot(toEye, cameraTranspose[2].xyz));
+    
     
     float2 p = input.worldPosition.xz;
     float2 k0 = float2(6.f, 16.f);
@@ -26,9 +28,10 @@ PixelOutput main(PixelInputType input)
     float fresnel = Fresnel_Schlick(float3(0.25f, 0.25f, 0.25f), float3(0.0f, 1.0f, 0.0f), toEye);
 
     float2 resolution = float2(aResolutionHeight, aResolutionWidth);
-    float3 reflection = reflectionTexture.Sample(sampleState, input.position.xy / resolution + offset).rgb;
+    float3 reflection = reflectionTexture.Sample(sampleState, (input.position.xy / resolution + offset)).rgb;
     
     float3 resCol = tonemap_s_gamut3_cine(fresnel * reflection);
+    resCol.b = clamp(resCol.b * 4, 0, 1);
     result.color.rgb = resCol;
     result.color.a = 1.0f;
     

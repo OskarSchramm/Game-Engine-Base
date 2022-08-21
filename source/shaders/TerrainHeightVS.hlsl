@@ -8,14 +8,10 @@ PixelInputType main(VertexInputType input)
     //MVP
     float4 pos = float4(input.position, 1.0f);
     float4 worldPos = mul(modelMatrix, pos);
-    float4 vertexToClipPos = mul(modelToClipMatrix, worldPos);
-    output.position = vertexToClipPos;
-    
-    output.worldPosition = worldPos;
     
     //Normal
     float4 vertexObjectNormal = float4(input.normal, 0.0f);
-    float4 vertexWorldNormal  = mul(modelMatrix, vertexObjectNormal);
+    float4 vertexWorldNormal = mul(modelMatrix, vertexObjectNormal);
     output.normal = normalize(vertexWorldNormal);
     
     //Tangent
@@ -28,9 +24,11 @@ PixelInputType main(VertexInputType input)
     float4 vertexWorldBitangent = mul(modelMatrix, vertexObjectBitangent);
     output.bitangent = normalize(vertexWorldBitangent);
     
+    output.position = float4(input.lmCoord.x, input.lmCoord.y, 0, 0);
+    output.worldPosition = worldPos;
     output.uv = input.uv;
-    output.clip = worldPos.y - waterHeight;
     output.lmCoord = input.lmCoord;
+    output.clip = 0.0f;
     
     return output;
 }

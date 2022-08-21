@@ -9,4 +9,5 @@ struct Vertex
 	CU::Vector3f normal;
 	CU::Vector3f tangent;
 	CU::Vector3f bitangent;
+	CU::Vector2f lmCoord;
 };

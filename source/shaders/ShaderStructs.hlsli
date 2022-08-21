@@ -5,6 +5,9 @@ struct VertexInputType
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
+    
+    //ADDED
+    float2 lmCoord : LMCOORD;
 };
 
 struct PixelInputType
@@ -16,6 +19,9 @@ struct PixelInputType
     float3 bitangent : BITANGENT;
     float3 worldPosition : WORLDPOSITION;
     float clip : SV_ClipDistance;
+    
+    //ADDED
+    float2 lmCoord : LMCOORD;
 };
 
 struct PixelOutput

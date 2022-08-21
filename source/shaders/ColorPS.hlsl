@@ -7,6 +7,28 @@ PixelOutput main(PixelInputType input)
 {
     PixelOutput result;
     
+    //blur lightmap
+    float4 Offsets = float4(-1.5, -0.5, 0.5, 1.5);
+    float AOblurred = 0.0f;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            float2 tc;
+            tc.x = input.position.x + Offsets[j] / aResolutionWidth;
+            tc.y = input.position.y + Offsets[i] / aResolutionHeight;
+            AOblurred += lightMapTexture.Sample(sampleState, tc).r;
+        }
+    }
+    
+    AOblurred /= 16.0;
+    
+    //lightmapStuff
+    float2 resolution = float2(aResolutionHeight, aResolutionWidth);
+    float2 lightMap = lightMapTexture.Sample(sampleState, input.position.xy / resolution).rg;
+    float3 directionalLightLM = directionalLightColor.xyz; // * lightMap.g
+   
+    
     float3 toEye = normalize(cameraPosition.xyz - input.worldPosition.xyz);
     
     //TBN Matrix in Object Space
@@ -54,21 +76,21 @@ PixelOutput main(PixelInputType input)
     float3 diffuseColor = lerp((float3) 0.00f, albedo.rgb, 1 - material.r);
     
     float3 ambiance = EvaluateAmbiance(
-		cubeMap, normal, input.normal,
+		AOblurred, cubeMap, normal, input.normal,
 		toEye, material.g,
 		ao, diffuseColor, specularColor
 	);
 
     float3 dirL = EvaluateDirectionalLight(
 		diffuseColor, specularColor, normal, material.g,
-		directionalLightColor.xyz, directionalLightDir, toEye.xyz
+		directionalLightLM, directionalLightDir, toEye.xyz
 	);
     
     //float3 emissiveAlbedo = albedo.rgb * material.b;
     float3 radiance = float3(sky.xyz + ground.xyz) + dirL + ambiance;
     
     float3 finalColor = radiance;
-    result.color.rgb = tonemap_s_gamut3_cine(finalColor);
+    result.color.rgb = lightMap.r; //tonemap_s_gamut3_cine(finalColor)
     result.color.a = 1.0f;
     
     return result;

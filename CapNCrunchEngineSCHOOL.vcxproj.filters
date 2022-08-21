@@ -24,6 +24,18 @@
     <FxCompile Include="source\shaders\WaterPS.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
+    <FxCompile Include="source\shaders\LightMapPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="source\shaders\TerrainHeightPS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="source\shaders\LightMapVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="source\shaders\TerrainHeightVS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Camera.h">

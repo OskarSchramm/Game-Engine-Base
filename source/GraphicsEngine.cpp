@@ -125,9 +125,6 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	if (!CreateDepthBufferAndStencil(aWidth, aHeight))
 		return false;
 
-	//NO need
-	myContext->OMSetRenderTargets(1, myBackBuffer.GetAddressOf(), myDepthBuffer);
-
 	if (!CreateConstantBuffers())
 		return false;
 
@@ -136,7 +133,7 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 
 	myCamera.Init(CU::Vector3f{ 0.0f, 5.0f, -5.0f }, {45.0f, 45.0f, 0.0f}, 90.0f, CU::Vector2f{ (float)aWidth, (float)aHeight }, 0.01f, 1000.0f);
 
-	myLight.SetDirectionalLight({ 0.5f, -0.5f, 0.0f }, {0.1f, 0.1f, 0.1, 0.5f});
+	myLight.SetDirectionalLight({ 0.95f, 0.17f, 0.0f }, {1.f, 1.f, 1.f, 1.f});
 	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25f, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f }); 
 
 	myCubeMap.Init(myDevice.Get(), myContext.Get(), L"bin/data/textures/cube_1024_preblurred_angle3_Skansen3.dds");
@@ -147,8 +144,9 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	CreateWaterRenderTarget(aWidth, aHeight);
 	CreateFFCRasterizer();
 	GeneratePlane(20, myWaterHeight);
-
 	UpdateSettingsBuffer(aWidth, aHeight);
+
+	CalculateLightMap(aWidth, aHeight);
 
 	return true;
 }
@@ -354,15 +352,15 @@ bool GraphicsEngine::CreateWaterRenderTarget(const float aWidth, const float aHe
 	if (FAILED(result))
 		return false;
 
-	result = myDevice->CreateShaderResourceView(texture, nullptr, &myWaterReflectionRenderTarget.myShaderResource);
+	result = myDevice->CreateShaderResourceView(texture, nullptr, &myWaterReflectionRT.myShaderResource);
 	if (FAILED(result))
 		return false;
 
-	result = myDevice->CreateRenderTargetView(texture, nullptr, &myWaterReflectionRenderTarget.myRenderTargetView);
+	result = myDevice->CreateRenderTargetView(texture, nullptr, &myWaterReflectionRT.myRenderTargetView);
 
 	texture->Release();
 
-	myContext->PSSetShaderResources(10, 1, &myWaterReflectionRenderTarget.myShaderResource);
+	myContext->PSSetShaderResources(10, 1, &myWaterReflectionRT.myShaderResource);
 
 	return true;
 }
@@ -386,19 +384,12 @@ bool GraphicsEngine::GeneratePlane(const float aSize, const float aHeightPositio
 {
 	Vertex vertices[]
 	{
-		CU::Vector3f{-0.5f, aHeightPosition,  0.5f}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-		CU::Vector3f{ 0.5f, aHeightPosition,  0.5f}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-		CU::Vector3f{-0.5f, aHeightPosition, -0.5f}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-		CU::Vector3f{ 0.5f, aHeightPosition, -0.5f}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
+		//position                        //uv                      //normal                        //tangent                       //bitangent                     //lm coord
+		CU::Vector3f{-0.5f, 0.0f,  0.5f}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+		CU::Vector3f{ 0.5f, 0.0f,  0.5f}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+		CU::Vector3f{-0.5f, 0.0f, -0.5f}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+		CU::Vector3f{ 0.5f, 0.0f, -0.5f}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
 	};
-
-	//Vertex vertices[]
-	//{
-	//	CU::Vector3f{0.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-	//	CU::Vector3f{0.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-	//	CU::Vector3f{1.0f * aSize, aHeightPosition, 0.0f * aSize}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-	//	CU::Vector3f{1.0f * aSize, aHeightPosition, 1.0f * aSize}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f},
-	//};
 
 	unsigned int indices[]
 	{
@@ -408,12 +399,12 @@ bool GraphicsEngine::GeneratePlane(const float aSize, const float aHeightPositio
 
 	myWaterPlane = new Primitive(myDevice.Get(), myContext.Get());
 	myWaterPlane->Init(vertices, 4, indices, std::size(indices));
-	myWaterPlane->SetPosition({ 0.5f * aSize, 0.0, 0.5f * aSize });
+	myWaterPlane->SetPosition({ 0.5f * aSize, aHeightPosition, 0.5f * aSize });
 	myWaterPlane->GetModelMatrix().SetScale({aSize, 0.0f, aSize });
 	myWaterPlane->SetVertexShader(L"ColorVS");
 	myWaterPlane->SetPixelShader(L"WaterPS");
 
-	myWaterPlane->AddTexture(myWaterReflectionRenderTarget.myShaderResource, 10);
+	myWaterPlane->AddTexture(myWaterReflectionRT.myShaderResource, 10);
 
 	return true;
 }
@@ -440,6 +431,9 @@ bool GraphicsEngine::GenerateTerrain()
 	Vertex* vertices = new Vertex[heightMap.size()];
 	GenerateVertices(vertices, heightMap, resolution);
 	GenerateNormals(vertices, heightMap.size(), resolution);
+
+	//ADDED
+	GenerateLMCoords(vertices, heightMap.size(), resolution);
 
 	unsigned int indexCount = ((resolution - 1) * (resolution - 1)) * 6;
 	unsigned int* indices = new unsigned int[indexCount];
@@ -516,10 +510,11 @@ void GraphicsEngine::GenerateNormals(Vertex* outVertices, const size_t amountVer
 		const CU::Vector3f vertical = below - above;
 		const CU::Vector3f horizontal = right - left;
 
+		//Normal
 		const CU::Vector3f Ncross = (horizontal.Cross(vertical)).GetNormalized();
 		memcpy(&outVertices[i].normal, &Ncross, sizeof(CU::Vector3f));
 		
-		
+		//Tangent & Bitangent
 		const CU::Vector3f crossTanget = outVertices[i].normal.Cross(CU::Vector3f(0.0f, 0.0f, 1.0f)).GetNormalized();
 		const CU::Vector3f crossBitanget = outVertices[i].normal.Cross(CU::Vector3f(1.0f, 0.0f, 0.0f)).GetNormalized();
 		memcpy(&outVertices[i].tangent, &crossTanget, sizeof(CU::Vector3f));
@@ -605,12 +600,14 @@ void GraphicsEngine::UpdateAndBindBuffers()
 
 void GraphicsEngine::Render()
 {
-	//Render to texture upside down
+	RenderLightmap();
+
 	RenderWaterToTexture();
 
 	SetRenderTargets(myBackBuffer.GetAddressOf(), nullptr);
 	UpdateAndBindBuffers();
 
+	//RenderPrimitive(myExtraPlane);
 	RenderPrimitive(myWaterPlane);
 
 	RenderPrimitive(myTerrain);
@@ -620,12 +617,12 @@ void GraphicsEngine::Render()
 
 void GraphicsEngine::RenderWaterToTexture()
 {
-	SetRenderTargets(&myWaterReflectionRenderTarget.myRenderTargetView, myFFCRasterState);
+	SetRenderTargets(&myWaterReflectionRT.myRenderTargetView, myFFCRasterState);
 
 	D3D11_MAPPED_SUBRESOURCE mappedCBuffer = {};
 	{
 		FrameBuffer frameBufferData = {};
-		auto worldToClip = myCamera.GetReflectionMatrix(myWaterHeight);
+		auto worldToClip = myCamera.GetReflectionMatrix(-myWaterHeight);
 
 		frameBufferData.worldToClipMatrix = worldToClip;
 		frameBufferData.cameraMatrix = myCamera.GetTransform();
@@ -672,12 +669,144 @@ void GraphicsEngine::RenderPrimitive(Primitive* aPrimitive)
 
 void GraphicsEngine::Update()
 {
-	float t = myTimer.GetTotalTime();
-	float rotSpeed = 0.3f;
-	myLight.SetDirectionalLight({std::sin(t * rotSpeed), std::cos(t * rotSpeed), 0.0f}, {1.0f, 1.0f, 1.0, 1.0f});
-	//myLight.SetAmbientLight({ 1.0f - CU::Clamp(0.1f, 0.8f, CU::Clamp(0.0f, 0.8f, std::sin(t * rotSpeed))), 0.25f, 0.35, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f });
-
 	myTimer.Update();
 
 	myCamera.Update(myTimer.GetDeltaTime());
+}
+
+void GraphicsEngine::RenderLightmap()
+{
+	UpdateAndBindBuffers();
+
+	SetRenderTargets(&myTerrainPropertiesRT.myRenderTargetView, nullptr);
+
+	myTerrain->SetPixelShader(L"TerrainHeightPS");
+	myTerrain->SetVertexShader(L"LightMapVS");
+	RenderPrimitive(myTerrain);
+	myTerrain->SetVertexShader(L"ColorVS");
+	myTerrain->SetPixelShader(L"ColorPS");
+
+	SetRenderTargets(&myLightMapRT.myRenderTargetView, nullptr);
+	RenderPrimitive(myExtraPlane);
+}
+
+void GraphicsEngine::GenerateLMCoords(Vertex* outVertices, const size_t amountVertices, const float aResolution)
+{
+	myLMWidth = 256;
+	myLMHeight = 256;
+
+	for (size_t i = 0; i < amountVertices; i++)
+	{
+		size_t row = i / (int)aResolution;
+		size_t column = i % (int)aResolution;
+
+		float x0 = row    / (float)myLMWidth;
+
+		float y0 = column / (float)myLMHeight;
+
+		outVertices->lmCoord = { x0, y0 };
+	}
+}
+
+bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
+{
+	HRESULT result;
+
+#pragma region Terrain Texture RT
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = aWidth;
+	desc.Height = aHeight;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	ID3D11Texture2D* texture0 = nullptr;
+	result = myDevice->CreateTexture2D(&desc, nullptr, &texture0);
+	if (FAILED(result))
+		return false;
+
+	result = myDevice->CreateShaderResourceView(texture0, nullptr, &myTerrainPropertiesRT.myShaderResource);
+	if (FAILED(result))
+		return false;
+
+	result = myDevice->CreateRenderTargetView(texture0, nullptr, &myTerrainPropertiesRT.myRenderTargetView);
+
+	texture0->Release();
+
+	myContext->PSSetShaderResources(11, 1, &myTerrainPropertiesRT.myShaderResource);
+
+#pragma endregion Terrain Texture RT
+
+#pragma region Lightmap Texture RT
+	D3D11_TEXTURE2D_DESC descLM = {};
+	descLM.Width = aWidth;
+	descLM.Height = aHeight;
+	descLM.MipLevels = 1;
+	descLM.ArraySize = 1;
+	descLM.Format = DXGI_FORMAT_R32G32_FLOAT;
+	descLM.SampleDesc.Count = 1;
+	descLM.SampleDesc.Quality = 0;
+	descLM.Usage = D3D11_USAGE_DEFAULT;
+	descLM.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	descLM.CPUAccessFlags = 0;
+	descLM.MiscFlags = 0;
+
+	ID3D11Texture2D* texture1 = nullptr;
+	result = myDevice->CreateTexture2D(&desc, nullptr, &texture1);
+	if (FAILED(result))
+		return false;
+
+	result = myDevice->CreateShaderResourceView(texture1, nullptr, &myLightMapRT.myShaderResource);
+	if (FAILED(result))
+		return false;
+
+	result = myDevice->CreateRenderTargetView(texture1, nullptr, &myLightMapRT.myRenderTargetView);
+
+	texture1->Release();
+
+	myContext->PSSetShaderResources(13, 1, &myLightMapRT.myShaderResource);
+
+#pragma endregion Lightmap Texture RT
+
+#pragma region NoiseTexture
+	myNoiseTexture.Init(myDevice.Get(), myContext.Get(), L"bin/data/textures/RNT-256.dds", false, false, false);
+
+#pragma endregion NoiseTexture
+
+#pragma region Plane
+	Vertex vertices[]
+	{
+		CU::Vector3f{-0.5f, 0.0f,  0.5f}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+		CU::Vector3f{ 0.5f, 0.0f,  0.5f}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+		CU::Vector3f{-0.5f, 0.0f, -0.5f}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+		CU::Vector3f{ 0.5f, 0.0f, -0.5f}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+	};
+
+	unsigned int indices[]
+	{
+		0, 1, 2,
+		1, 3, 2
+	};
+
+	myExtraPlane = new Primitive(myDevice.Get(), myContext.Get());
+	myExtraPlane->Init(vertices, 4, indices, std::size(indices));
+	myExtraPlane->SetPosition({ 0.5f * 20, 1.5f, 0.5f * 20 });
+	myExtraPlane->GetModelMatrix().SetScale({ 20, 0.0f, 20 });
+	myExtraPlane->SetVertexShader(L"LightMapVS");
+	myExtraPlane->SetPixelShader(L"LightMapPS");
+
+	myExtraPlane->AddTexture(myTerrainPropertiesRT.myShaderResource, 11);
+	myExtraPlane->AddTexture(myNoiseTexture.GetTextureResource(), 12);
+	myTerrain->AddTexture(myLightMapRT.myShaderResource, 13);
+#pragma endregion Plane
+
+	RenderLightmap();
+
+	return true;
 }

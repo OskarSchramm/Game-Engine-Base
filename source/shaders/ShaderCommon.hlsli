@@ -12,6 +12,8 @@ Texture2D snowMaterial : register(t8);
 
 TextureCube cubeMap : register(t9);
 
+Texture2D lightMapTexture : register(t13);
+
 SamplerState sampleState : register(s0);
 
 cbuffer FrameBuffer : register(b0)
