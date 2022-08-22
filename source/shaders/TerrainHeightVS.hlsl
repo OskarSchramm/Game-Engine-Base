@@ -1,9 +1,9 @@
 #include "ShaderStructs.hlsli"
 #include "ShaderCommon.hlsli"
 
-PixelInputType main(VertexInputType input)
+LightmapInputType main(VertexInputType input)
 {
-    PixelInputType output;
+    LightmapInputType output;
     
     //MVP
     float4 pos = float4(input.position, 1.0f);
@@ -24,11 +24,13 @@ PixelInputType main(VertexInputType input)
     float4 vertexWorldBitangent = mul(modelMatrix, vertexObjectBitangent);
     output.bitangent = normalize(vertexWorldBitangent);
     
-    output.position = float4(input.lmCoord.x, input.lmCoord.y, 0, 0);
+    float lmX = input.lmCoord.x - 1.0f;
+    float lmY = input.lmCoord.y - 1.0f;
+    float2 lmPos = float2((lmX), (lmY));
+    
+    output.position = float4(lmPos.x, lmPos.y, 0.0f, 1.0f);
     output.worldPosition = worldPos;
-    output.uv = input.uv;
     output.lmCoord = input.lmCoord;
-    output.clip = 0.0f;
     
     return output;
 }

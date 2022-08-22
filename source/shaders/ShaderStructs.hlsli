@@ -24,6 +24,17 @@ struct PixelInputType
     float2 lmCoord : LMCOORD;
 };
 
+struct LightmapInputType
+{
+    float4 position : SV_POSITION;
+    float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float3 bitangent : BITANGENT;
+    float3 worldPosition : WORLDPOSITION;
+    float2 lmCoord : TEXCOORD;
+};
+
+
 struct PixelOutput
 {
     float4 color : SV_TARGET;

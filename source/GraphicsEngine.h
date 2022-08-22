@@ -89,9 +89,12 @@ private:
 	void GenerateNormals(Vertex* outVertices, const size_t amountVertices, const float aResolution);
 	void GenerateIndices(unsigned int* outIndices, const size_t indexCount, const float aResolution);
 
+	//Lightmap
 	void GenerateLMCoords(Vertex* outVertices, const size_t amountVertices, const float aResolution);
 	bool CalculateLightMap(const float aWidth, const float aHeight);
 	void RenderLightmap();
+	void ChangeToMainFramebuffer();
+	bool CreateNFCRasterizer();
 	
 	void RenderPrimitive(Primitive* aPrimitive);
 
@@ -117,13 +120,17 @@ private:
 	RenderTarget myWaterReflectionRT;
 	ID3D11RasterizerState* myFFCRasterState;
 
+	D3D11_VIEWPORT myMainViewPort;
+
 	//LightMap
 	RenderTarget myTerrainPropertiesRT;
 	RenderTarget myLightMapRT;
-	Primitive* myExtraPlane;
-	Texture    myNoiseTexture;
-	uint  myLMWidth;
-	uint  myLMHeight;
+	Primitive*  myExtraPlane;
+	ID3D11RasterizerState* myNFCRS;
+	Texture     myNoiseTexture;
+	D3D11_VIEWPORT myLMWP;
+	const uint  myLMWidth  = 256;
+	const uint  myLMHeight = 256;
 	
 	Texture    myCubeMap;
 	Light	   myLight;

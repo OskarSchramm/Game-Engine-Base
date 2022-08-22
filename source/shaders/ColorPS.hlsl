@@ -3,31 +3,39 @@
 #include "CommonFunctions.hlsli"
 #include "PBRFunctions.hlsli"
 
+#define USE_LM true
+
 PixelOutput main(PixelInputType input)
 {
     PixelOutput result;
     
-    //blur lightmap
-    float4 Offsets = float4(-1.5, -0.5, 0.5, 1.5);
-    float AOblurred = 0.0f;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            float2 tc;
-            tc.x = input.position.x + Offsets[j] / aResolutionWidth;
-            tc.y = input.position.y + Offsets[i] / aResolutionHeight;
-            AOblurred += lightMapTexture.Sample(sampleState, tc).r;
-        }
-    }
-    
-    AOblurred /= 16.0;
+    float LMAO = 0.0f;
+    float3 dirLightLM = directionalLightColor.xyz;
+    float2 lightMap;
+    float2 sampleOffset = float2((1 - input.lmCoord.x) / 2, (1 - input.lmCoord.y) / 2);
     
     //lightmapStuff
-    float2 resolution = float2(aResolutionHeight, aResolutionWidth);
-    float2 lightMap = lightMapTexture.Sample(sampleState, input.position.xy / resolution).rg;
-    float3 directionalLightLM = directionalLightColor.xyz; // * lightMap.g
-   
+    if (USE_LM)
+    {
+        lightMap = lmTexture.Sample(sampleState, sampleOffset).rg;
+        dirLightLM *= lightMap.g;
+
+        //blur ao
+        float4 offsets = float4(-1.5, -0.5, 0.5, 1.5);
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                float2 tc;
+                tc.x = sampleOffset.x + offsets[j];
+                tc.y = sampleOffset.y + offsets[i];
+                LMAO += lmTexture.Sample(sampleState, tc).r;
+            }
+        }
+    
+        LMAO /= 16.0;
+    }
+    
     
     float3 toEye = normalize(cameraPosition.xyz - input.worldPosition.xyz);
     
@@ -76,21 +84,28 @@ PixelOutput main(PixelInputType input)
     float3 diffuseColor = lerp((float3) 0.00f, albedo.rgb, 1 - material.r);
     
     float3 ambiance = EvaluateAmbiance(
-		AOblurred, cubeMap, normal, input.normal,
+		LMAO, cubeMap, normal, input.normal,
 		toEye, material.g,
 		ao, diffuseColor, specularColor
 	);
 
     float3 dirL = EvaluateDirectionalLight(
 		diffuseColor, specularColor, normal, material.g,
-		directionalLightLM, directionalLightDir, toEye.xyz
+		dirLightLM, directionalLightDir, toEye.xyz
 	);
     
     //float3 emissiveAlbedo = albedo.rgb * material.b;
     float3 radiance = float3(sky.xyz + ground.xyz) + dirL + ambiance;
     
     float3 finalColor = radiance;
-    result.color.rgb = lightMap.r; //tonemap_s_gamut3_cine(finalColor)
+    
+    if (USE_LM)
+    {
+        result.color.rgb = LMAO;
+    }
+    else
+        result.color.rgb = tonemap_s_gamut3_cine(finalColor);
+    
     result.color.a = 1.0f;
     
     return result;

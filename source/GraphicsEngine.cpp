@@ -220,14 +220,14 @@ bool GraphicsEngine::CreateViewPort(int& aWidth, int& aHeight)
 	aWidth = static_cast<float>(textureDesc.Width);
 	aHeight = static_cast<float>(textureDesc.Height);
 
-	D3D11_VIEWPORT viewport = { 0 };
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = aWidth;
-	viewport.Height = aHeight;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	myContext->RSSetViewports(1, &viewport);
+	myMainViewPort = { 0 };
+	myMainViewPort.TopLeftX = 0;
+	myMainViewPort.TopLeftY = 0;
+	myMainViewPort.Width = aWidth;
+	myMainViewPort.Height = aHeight;
+	myMainViewPort.MinDepth = 0.0f;
+	myMainViewPort.MaxDepth = 1.0f;
+	myContext->RSSetViewports(1, &myMainViewPort);
 
 	return true;
 }
@@ -374,6 +374,21 @@ bool GraphicsEngine::CreateFFCRasterizer()
 	rasterDesc.FillMode = D3D11_FILL_SOLID;
 
 	result = myDevice->CreateRasterizerState(&rasterDesc, &myFFCRasterState);
+	if (FAILED(result))
+		return false;
+
+	return true;
+}
+
+bool GraphicsEngine::CreateNFCRasterizer()
+{
+	HRESULT result;
+
+	D3D11_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.CullMode = D3D11_CULL_NONE;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+
+	result = myDevice->CreateRasterizerState(&rasterDesc, &myNFCRS);
 	if (FAILED(result))
 		return false;
 
@@ -604,12 +619,10 @@ void GraphicsEngine::Render()
 
 	RenderWaterToTexture();
 
-	SetRenderTargets(myBackBuffer.GetAddressOf(), nullptr);
+	ChangeToMainFramebuffer();
 	UpdateAndBindBuffers();
 
-	//RenderPrimitive(myExtraPlane);
-	RenderPrimitive(myWaterPlane);
-
+	//RenderPrimitive(myWaterPlane);
 	RenderPrimitive(myTerrain);
 
 	mySwapChain->Present(1, 0);
@@ -649,6 +662,16 @@ void GraphicsEngine::SetRenderTargets(ID3D11RenderTargetView** aRenderTarget, ID
 	myContext->RSSetState(aRasterState);
 }
 
+void GraphicsEngine::ChangeToMainFramebuffer()
+{
+	constexpr float color[4] = { 0.97f, 0.59f, 0.38f, 1.0f };
+
+	myContext->OMSetRenderTargets(1, myBackBuffer.GetAddressOf(), myDepthBuffer);
+	myContext->ClearRenderTargetView(*myBackBuffer.GetAddressOf(), color);
+	myContext->ClearDepthStencilView(myDepthBuffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	myContext->RSSetState(nullptr);
+}
+
 void GraphicsEngine::RenderPrimitive(Primitive* aPrimitive)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedCBuffer = {};
@@ -678,33 +701,39 @@ void GraphicsEngine::RenderLightmap()
 {
 	UpdateAndBindBuffers();
 
-	SetRenderTargets(&myTerrainPropertiesRT.myRenderTargetView, nullptr);
+	constexpr float color[4] = { 0.2f, 0.45f, 0.84f, 1.0f };
 
+	myContext->OMSetRenderTargets(1, &myTerrainPropertiesRT.myRenderTargetView, nullptr);
+	myContext->ClearRenderTargetView(myTerrainPropertiesRT.myRenderTargetView, color);
+	myContext->RSSetState(myNFCRS);
+	myContext->RSSetViewports(1, &myLMWP);
+
+	//Render heightmap
+	myTerrain->SetVertexShader(L"TerrainHeightVS");
 	myTerrain->SetPixelShader(L"TerrainHeightPS");
-	myTerrain->SetVertexShader(L"LightMapVS");
 	RenderPrimitive(myTerrain);
-	myTerrain->SetVertexShader(L"ColorVS");
-	myTerrain->SetPixelShader(L"ColorPS");
 
+	//Render lightmap
 	SetRenderTargets(&myLightMapRT.myRenderTargetView, nullptr);
 	RenderPrimitive(myExtraPlane);
+
+	//Reset
+	myTerrain->SetVertexShader(L"ColorVS");
+	myTerrain->SetPixelShader(L"ColorPS");
+	myContext->RSSetViewports(1, &myMainViewPort);
 }
 
 void GraphicsEngine::GenerateLMCoords(Vertex* outVertices, const size_t amountVertices, const float aResolution)
 {
-	myLMWidth = 256;
-	myLMHeight = 256;
-
 	for (size_t i = 0; i < amountVertices; i++)
 	{
 		size_t row = i / (int)aResolution;
 		size_t column = i % (int)aResolution;
 
-		float x0 = row    / (float)myLMWidth;
+		float x0 = (row    / ((float)myLMWidth  / 2.0f));
+		float y0 = (column / ((float)myLMHeight / 2.0f));
 
-		float y0 = column / (float)myLMHeight;
-
-		outVertices->lmCoord = { x0, y0 };
+		outVertices[i].lmCoord = { x0, y0 };
 	}
 }
 
@@ -714,8 +743,8 @@ bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
 
 #pragma region Terrain Texture RT
 	D3D11_TEXTURE2D_DESC desc = {};
-	desc.Width = aWidth;
-	desc.Height = aHeight;
+	desc.Width = myLMWidth;
+	desc.Height = myLMHeight;
 	desc.MipLevels = 1;
 	desc.ArraySize = 1;
 	desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -745,8 +774,8 @@ bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
 
 #pragma region Lightmap Texture RT
 	D3D11_TEXTURE2D_DESC descLM = {};
-	descLM.Width = aWidth;
-	descLM.Height = aHeight;
+	descLM.Width = myLMWidth;
+	descLM.Height = myLMHeight;
 	descLM.MipLevels = 1;
 	descLM.ArraySize = 1;
 	descLM.Format = DXGI_FORMAT_R32G32_FLOAT;
@@ -780,12 +809,27 @@ bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
 #pragma endregion NoiseTexture
 
 #pragma region Plane
+	float lmMaxX = 1;
+	float lmMaxY = 1;
+
 	Vertex vertices[]
 	{
-		CU::Vector3f{-0.5f, 0.0f,  0.5f}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
-		CU::Vector3f{ 0.5f, 0.0f,  0.5f}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
-		CU::Vector3f{-0.5f, 0.0f, -0.5f}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
-		CU::Vector3f{ 0.5f, 0.0f, -0.5f}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{0.f, 0.f},
+		CU::Vector3f{-0.5f, 0.0f,  0.5f}, CU::Vector2f{0.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{-1.f, -1.f},
+		CU::Vector3f{ 0.5f, 0.0f,  0.5f}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{-1.f , lmMaxX},
+		CU::Vector3f{-0.5f, 0.0f, -0.5f}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{lmMaxX, -1.f},
+		CU::Vector3f{ 0.5f, 0.0f, -0.5f}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{lmMaxX, lmMaxX},
+
+
+		//CU::Vector2f{lmMaxX, lmMaxX},
+		//CU::Vector2f{lmMaxX , -1.f},
+		//CU::Vector2f{-1.0f, lmMaxX},
+		//CU::Vector2f{-1.0f, -1.0f},
+
+		//CU::Vector2f{-1.0f, -1.0f},
+		//CU::Vector2f{-1.0f , lmMaxX},
+		//CU::Vector2f{lmMaxX, -1.0f},
+		//CU::Vector2f{lmMaxX, lmMaxX},
+
 	};
 
 	unsigned int indices[]
@@ -805,6 +849,10 @@ bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
 	myExtraPlane->AddTexture(myNoiseTexture.GetTextureResource(), 12);
 	myTerrain->AddTexture(myLightMapRT.myShaderResource, 13);
 #pragma endregion Plane
+
+	myLMWP = { 0 , 0, (float)myLMWidth , (float)myLMHeight, 0, 1 };
+
+	CreateNFCRasterizer();
 
 	RenderLightmap();
 

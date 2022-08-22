@@ -113,7 +113,7 @@ float3 Specular(float3 specularColor, float3 h, float3 v, float a, float NdL, fl
     return ((NormalDistribution_GGX(a, NdH) * Geometric_Smith_Schlick_GGX(a, NdV, NdL)) * Fresnel_Schlick(specularColor, h, v)) / (4.0f * NdL * NdV + 0.0001f);
 }
 
-float3 EvaluateAmbiance(float lightmapAO, TextureCube lysBurleyCube, float3 vN, float3 VNUnit, float3 toEye, float perceptualRoughness, float ao, float3 dfcol, float3 spccol)
+float3 EvaluateAmbiance(float lmAO, TextureCube lysBurleyCube, float3 vN, float3 VNUnit, float3 toEye, float perceptualRoughness, float ao, float3 dfcol, float3 spccol)
 {
     int numMips = GetNumMips(lysBurleyCube);
     const int nrBrdMips = numMips - nMipOffset;
@@ -128,8 +128,8 @@ float3 EvaluateAmbiance(float lightmapAO, TextureCube lysBurleyCube, float3 vN, 
     float3 specRad = lysBurleyCube.SampleLevel(sampleState, vR, mipLevel).xyz;
     float3 diffRad = lysBurleyCube.SampleLevel(sampleState, vN, (float) (nrBrdMips - 1)).xyz;
     
-    specRad *= lightmapAO; //ADDED
-    diffRad *= lightmapAO; //ADDED
+    specRad *= lmAO; //ADDED
+    diffRad *= lmAO; //ADDED
 
     float fT = 1.0 - RdotNsat;
     float fT5 = fT * fT;
