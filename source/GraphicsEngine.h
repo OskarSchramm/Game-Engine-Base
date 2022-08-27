@@ -76,7 +76,6 @@ private:
 	bool CreateSamplerState();
 	void UpdateAndBindBuffers();
 
-	//ADDED
 	bool CreateWaterRenderTarget(const float aWidth, const float aHeight);
 	bool CreateFFCRasterizer();
 	bool GeneratePlane(const float aSize, const float aHeightPosition);
@@ -89,7 +88,7 @@ private:
 	void GenerateNormals(Vertex* outVertices, const size_t amountVertices, const float aResolution);
 	void GenerateIndices(unsigned int* outIndices, const size_t indexCount, const float aResolution);
 
-	//Lightmap
+	//ADDED Lightmap
 	void GenerateLMCoords(Vertex* outVertices, const size_t amountVertices, const float aResolution);
 	bool CalculateLightMap(const float aWidth, const float aHeight);
 	void RenderLightmap();
@@ -104,6 +103,7 @@ private:
 
 	ComPtr<ID3D11RenderTargetView> myBackBuffer;
 	ID3D11DepthStencilView*		   myDepthBuffer;
+	D3D11_VIEWPORT		           myMainViewPort;
 
 	ID3D11SamplerState*            mySampleState;
 
@@ -114,23 +114,20 @@ private:
 
 	SettingsBuffer				   mySettingsData;
 
-	//Water
 	const float myWaterHeight = -0.14f;
 	Primitive* myWaterPlane;
 	RenderTarget myWaterReflectionRT;
 	ID3D11RasterizerState* myFFCRasterState;
 
-	D3D11_VIEWPORT myMainViewPort;
-
-	//LightMap
-	RenderTarget myTerrainPropertiesRT;
-	RenderTarget myLightMapRT;
-	Primitive*  myExtraPlane;
+	//ADDED Lightmap
+	RenderTarget		   myTerrainPropertiesRT;
+	RenderTarget		   myLightMapRT;
+	Primitive*			   myExtraPlane;
 	ID3D11RasterizerState* myNFCRS;
-	Texture     myNoiseTexture;
-	D3D11_VIEWPORT myLMWP;
-	const uint  myLMWidth  = 512;
-	const uint  myLMHeight = 512;
+	Texture				   myNoiseTexture;
+	D3D11_VIEWPORT		   myLMWP;
+	const uint			   myLMWidth  = 512;
+	const uint			   myLMHeight = 512;
 	
 	Texture    myCubeMap;
 	Light	   myLight;

@@ -50,9 +50,9 @@ PixelOutput main(LightmapInputType input)
     
     float AOscalar = 1.2f;
     float resultAO = 0.0f;
-    float N = 128;   //how many rays
-    float RMA = 64; //ray marching amount
-    float RML = 0.25;   //ray marching length
+    float N = 128;         //how many rays
+    float RMA = 64;        //ray marching amount
+    float RML = 0.25;      //ray marching length
     float rayMarchMaxLengt = RMA * RML;
     float3 rayOrigin = float3(input.worldPosition.x, height, input.worldPosition.z);
     

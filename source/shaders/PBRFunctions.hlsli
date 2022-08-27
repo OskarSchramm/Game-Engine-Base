@@ -128,8 +128,8 @@ float3 EvaluateAmbiance(float lmAO, TextureCube lysBurleyCube, float3 vN, float3
     float3 specRad = lysBurleyCube.SampleLevel(sampleState, vR, mipLevel).xyz;
     float3 diffRad = lysBurleyCube.SampleLevel(sampleState, vN, (float) (nrBrdMips - 1)).xyz;
     
-    specRad *= lmAO; //ADDED
-    diffRad *= lmAO; //ADDED
+    specRad *= lmAO; //ADDED Lightmap
+    diffRad *= lmAO; //ADDED Lightmap
 
     float fT = 1.0 - RdotNsat;
     float fT5 = fT * fT;

@@ -146,6 +146,7 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 	GeneratePlane(20, myWaterHeight);
 	UpdateSettingsBuffer(aWidth, aHeight);
 
+	//ADDED Lightmap
 	CalculateLightMap(aWidth, aHeight);
 
 	return true;
@@ -447,7 +448,7 @@ bool GraphicsEngine::GenerateTerrain()
 	GenerateVertices(vertices, heightMap, resolution);
 	GenerateNormals(vertices, heightMap.size(), resolution);
 
-	//ADDED
+	//ADDED Lightmap
 	GenerateLMCoords(vertices, heightMap.size(), resolution);
 
 	unsigned int indexCount = ((resolution - 1) * (resolution - 1)) * 6;
@@ -617,10 +618,10 @@ void GraphicsEngine::Render()
 {
 	RenderWaterToTexture();
 
-	ChangeToMainFramebuffer();
+	ChangeToMainFramebuffer(); //<--Cleaner
 	UpdateAndBindBuffers();
 
-	//RenderPrimitive(myWaterPlane);
+	RenderPrimitive(myWaterPlane);
 	RenderPrimitive(myTerrain);
 
 	mySwapChain->Present(1, 0);
@@ -816,18 +817,6 @@ bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
 		CU::Vector3f{ 0.5f, 0.0f,  0.5f}, CU::Vector2f{1.0f, 0.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{-1.f , lmMaxX},
 		CU::Vector3f{-0.5f, 0.0f, -0.5f}, CU::Vector2f{0.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{lmMaxX, -1.f},
 		CU::Vector3f{ 0.5f, 0.0f, -0.5f}, CU::Vector2f{1.0f, 1.0f}, CU::Vector3f{0.0f, 1.0f, 0.0f}, CU::Vector3f{0.0f, 0.0f, 1.0f}, CU::Vector3f{1.0f, 0.0f, 0.0f}, CU::Vector2f{lmMaxX, lmMaxX},
-
-
-		//CU::Vector2f{lmMaxX, lmMaxX},
-		//CU::Vector2f{lmMaxX , -1.f},
-		//CU::Vector2f{-1.0f, lmMaxX},
-		//CU::Vector2f{-1.0f, -1.0f},
-
-		//CU::Vector2f{-1.0f, -1.0f},
-		//CU::Vector2f{-1.0f , lmMaxX},
-		//CU::Vector2f{lmMaxX, -1.0f},
-		//CU::Vector2f{lmMaxX, lmMaxX},
-
 	};
 
 	unsigned int indices[]
@@ -848,11 +837,9 @@ bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
 #pragma endregion Plane
 
 	myTerrain->AddTexture(myLightMapRT.myShaderResource, 13);
-
 	myLMWP = { 0 , 0, (float)myLMWidth , (float)myLMHeight, 0, 1 };
 
 	CreateNFCRasterizer();
-
 	RenderLightmap();
 
 	return true;

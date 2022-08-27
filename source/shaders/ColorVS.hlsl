@@ -29,7 +29,7 @@ PixelInputType main(VertexInputType input)
     output.bitangent = normalize(vertexWorldBitangent);
     
     output.uv = input.uv;
-    output.clip = 0.0f; //worldPos.y - waterHeight
+    output.clip = worldPos.y - waterHeight;
     output.lmCoord = float2(input.lmCoord.x, -input.lmCoord.y); //float2(-input.lmCoord.x, input.lmCoord.y);
     
     return output;

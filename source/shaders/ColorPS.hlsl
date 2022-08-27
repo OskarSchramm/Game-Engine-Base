@@ -9,12 +9,12 @@ PixelOutput main(PixelInputType input)
 {
     PixelOutput result;
     
+    //lightmapStuff
     float LMAO = 0.0f;
     float3 dirLightLM = directionalLightColor.xyz;
     float2 lightMap;
     float2 sampleOffset = float2(1 + input.lmCoord.x / 2, 1 + input.lmCoord.y / 2);
     
-    //lightmapStuff
     if (USE_LM)
     {
         dirLightLM *= lmTexture.Sample(sampleState, sampleOffset).g;
@@ -98,13 +98,7 @@ PixelOutput main(PixelInputType input)
     
     float3 finalColor = radiance;
     
-    if (USE_LM)
-    {
-        result.color.rgb = lmTexture.Sample(sampleState, sampleOffset).r;
-        result.color.rgb = tonemap_s_gamut3_cine(finalColor);
-    }
-    else
-        result.color.rgb = tonemap_s_gamut3_cine(finalColor);
+    result.color.rgb = tonemap_s_gamut3_cine(finalColor);
     
     result.color.a = 1.0f;
     

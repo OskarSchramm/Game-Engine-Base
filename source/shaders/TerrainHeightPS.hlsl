@@ -10,7 +10,7 @@ PixelOutput main(LightmapInputType input)
     result.color.r = input.normal.x;
     result.color.g = input.normal.y;
     result.color.b = input.normal.z;
-    result.color.a = clamp((1 + input.worldPosition.y) / 2, 0, 1);
+    result.color.a = saturate((1 + input.worldPosition.y) / 2);
 
     return result;
 }
