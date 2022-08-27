@@ -129,8 +129,8 @@ private:
 	ID3D11RasterizerState* myNFCRS;
 	Texture     myNoiseTexture;
 	D3D11_VIEWPORT myLMWP;
-	const uint  myLMWidth  = 256;
-	const uint  myLMHeight = 256;
+	const uint  myLMWidth  = 512;
+	const uint  myLMHeight = 512;
 	
 	Texture    myCubeMap;
 	Light	   myLight;

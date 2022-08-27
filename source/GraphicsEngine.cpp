@@ -133,7 +133,7 @@ bool GraphicsEngine::Init(int aWidth, int aHeight, HWND aWindowHandle)
 
 	myCamera.Init(CU::Vector3f{ 0.0f, 5.0f, -5.0f }, {45.0f, 45.0f, 0.0f}, 90.0f, CU::Vector2f{ (float)aWidth, (float)aHeight }, 0.01f, 1000.0f);
 
-	myLight.SetDirectionalLight({ 0.95f, 0.17f, 0.0f }, {1.f, 1.f, 1.f, 1.f});
+	myLight.SetDirectionalLight({ 0.95f, 0.17f, 0.0f }, { 1.f, 1.f, 1.f, 1.f });
 	myLight.SetAmbientLight({ 0.9f, 0.35f, 0.25f, 1.0f }, { 0.65f, 0.5f, 0.37f, 1.0f }); 
 
 	myCubeMap.Init(myDevice.Get(), myContext.Get(), L"bin/data/textures/cube_1024_preblurred_angle3_Skansen3.dds");
@@ -615,8 +615,6 @@ void GraphicsEngine::UpdateAndBindBuffers()
 
 void GraphicsEngine::Render()
 {
-	RenderLightmap();
-
 	RenderWaterToTexture();
 
 	ChangeToMainFramebuffer();
@@ -730,8 +728,8 @@ void GraphicsEngine::GenerateLMCoords(Vertex* outVertices, const size_t amountVe
 		size_t row = i / (int)aResolution;
 		size_t column = i % (int)aResolution;
 
-		float x0 = (row    / ((float)myLMWidth  / 2.0f));
-		float y0 = (column / ((float)myLMHeight / 2.0f));
+		float x0 = (row    / ((float)myLMWidth  / (myLMWidth / 128 )));
+		float y0 = (column / ((float)myLMHeight / (myLMHeight / 128)));
 
 		outVertices[i].lmCoord = { x0, y0 };
 	}
@@ -847,8 +845,9 @@ bool GraphicsEngine::CalculateLightMap(const float aWidth, const float aHeight)
 
 	myExtraPlane->AddTexture(myTerrainPropertiesRT.myShaderResource, 11);
 	myExtraPlane->AddTexture(myNoiseTexture.GetTextureResource(), 12);
-	myTerrain->AddTexture(myLightMapRT.myShaderResource, 13);
 #pragma endregion Plane
+
+	myTerrain->AddTexture(myLightMapRT.myShaderResource, 13);
 
 	myLMWP = { 0 , 0, (float)myLMWidth , (float)myLMHeight, 0, 1 };
 

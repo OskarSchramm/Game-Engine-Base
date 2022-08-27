@@ -12,13 +12,12 @@ PixelOutput main(PixelInputType input)
     float LMAO = 0.0f;
     float3 dirLightLM = directionalLightColor.xyz;
     float2 lightMap;
-    float2 sampleOffset = float2((1 - input.lmCoord.x) / 2, (1 - input.lmCoord.y) / 2);
+    float2 sampleOffset = float2(1 + input.lmCoord.x / 2, 1 + input.lmCoord.y / 2);
     
     //lightmapStuff
     if (USE_LM)
     {
-        lightMap = lmTexture.Sample(sampleState, sampleOffset).rg;
-        dirLightLM *= lightMap.g;
+        dirLightLM *= lmTexture.Sample(sampleState, sampleOffset).g;
 
         //blur ao
         float4 offsets = float4(-1.5, -0.5, 0.5, 1.5);
@@ -27,8 +26,8 @@ PixelOutput main(PixelInputType input)
             for (int j = 0; j < 4; j++)
             {
                 float2 tc;
-                tc.x = sampleOffset.x + offsets[j];
-                tc.y = sampleOffset.y + offsets[i];
+                tc.x = (1 - (input.lmCoord.x * -1.0f)) / 2 + offsets[j];
+                tc.y = (1 - (input.lmCoord.y * -1.0f)) / 2 + offsets[i];
                 LMAO += lmTexture.Sample(sampleState, tc).r;
             }
         }
@@ -101,7 +100,8 @@ PixelOutput main(PixelInputType input)
     
     if (USE_LM)
     {
-        result.color.rgb = LMAO;
+        result.color.rgb = lmTexture.Sample(sampleState, sampleOffset).r;
+        result.color.rgb = tonemap_s_gamut3_cine(finalColor);
     }
     else
         result.color.rgb = tonemap_s_gamut3_cine(finalColor);

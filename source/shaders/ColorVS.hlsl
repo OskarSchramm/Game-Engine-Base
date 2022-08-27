@@ -30,7 +30,7 @@ PixelInputType main(VertexInputType input)
     
     output.uv = input.uv;
     output.clip = 0.0f; //worldPos.y - waterHeight
-    output.lmCoord = float2(-input.lmCoord.x, input.lmCoord.y);
+    output.lmCoord = float2(input.lmCoord.x, -input.lmCoord.y); //float2(-input.lmCoord.x, input.lmCoord.y);
     
     return output;
 }

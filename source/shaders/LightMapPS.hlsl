@@ -40,45 +40,46 @@ PixelOutput main(LightmapInputType input)
     PixelOutput result;
     
     float2 offsetSample = (1 + input.lmCoord) / 2;
-    float4 sampledColor = heightTexture.Sample(sampleState, offsetSample).rgba;
+    int mipMapLevel = 0;
     
     //break out variables from texture
+    float4 sampledColor = heightTexture.Sample(sampleState, offsetSample).rgba;
     float4 randomNoise = noiseTexture.Sample(sampleState, input.position.xy).rgba;
     float3 normal = float3(sampledColor.x, sampledColor.y, sampledColor.z);
     float height = float(sampledColor.a);
     
+    float AOscalar = 1.2f;
+    float resultAO = 0.0f;
     float N = 128;   //how many rays
-    float RMA = 128; //ray marching amount
-    float RML = 1;   //ray marching length
-    float3 rayOrigin = input.worldPosition;
+    float RMA = 64; //ray marching amount
+    float RML = 0.25;   //ray marching length
     float rayMarchMaxLengt = RMA * RML;
-    int mipMapLevel = 0;
+    float3 rayOrigin = float3(input.worldPosition.x, height, input.worldPosition.z);
     
     //Ray Marching AO
-    float resultAO = 0.0f;
     [fastopt]
     for (int i = 0; i < N; i++)
     {
-        float randNumber = rand_1_05(float2(randomNoise.x, randomNoise.y));
-        float3 randomRayDir = float3(normalize(normal + RandomUnitVector(randNumber)));
+        //float randNumber = rand_1_05(float2(randomNoise.x, randomNoise.y));
+        //float3 randomRayDir = float3(normalize(normal + RandomUnitVector(randNumber)));
+        float3 randomRayDir = fibonacci_sphere(i, N);
         
-        float resultAOinRay = 0.0f;
         float d0 = 0; //How far marched from origin;
         [fastopt]
         for (int k = 0; k < RMA; k++)
         {
-            float3 p = rayOrigin + d0 * randomRayDir;
             d0 += RML;
+            float3 AOray = rayOrigin + normalize(randomRayDir) * d0;
             
-            float sampleHeight = heightTexture.Sample(sampleState, offsetSample + p.xy, mipMapLevel).a;
-            if (sampleHeight > height)
+            float rayL = sqrt(AOray.x * AOray.x + AOray.y * AOray.y);
+            float2 pathTracedOffset = 1 + (normalize(randomRayDir.xz) * d0) / 40;
+            float sampleHeight = heightTexture.Sample(sampleState, offsetSample + pathTracedOffset, mipMapLevel).a;
+            if (sampleHeight < height)
             {
-                resultAOinRay += d0;
+                resultAO += d0 * AOscalar;
                 break;
             }
-            
         }
-        resultAO += resultAOinRay;
     }
     
     resultAO = 1.0f - (resultAO / (rayMarchMaxLengt * N));
@@ -87,20 +88,21 @@ PixelOutput main(LightmapInputType input)
     float resultShadow = 0.0f;
     float d0 = 0; //How far marched from origin;
     [fastopt]
-    for (int k = 0; k < RMA; k++)
+    for (int j = 0; j < RMA; j++)
     {
-        float3 p = rayOrigin + d0 * -directionalLightDir;
         d0 += RML;
+        float3 shadowRay = rayOrigin + normalize(directionalLightDir) * d0;
             
-        float sampleHeight = heightTexture.Sample(sampleState, offsetSample + p.xy, mipMapLevel).a;
-        if (sampleHeight > height)
+        float2 pathTracedOffset = (normalize(directionalLightDir.xz) * d0) / 512;
+        float sampleHeight = heightTexture.Sample(sampleState, offsetSample + pathTracedOffset, mipMapLevel).a;
+        if (sampleHeight < height)
         {
             resultShadow = 1.0f;
             break;
         }
     }
     
-    result.color.r = resultAO; //resultAO
+    result.color.r = resultAO;
     result.color.g = resultShadow;
     
     return result;
