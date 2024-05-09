@@ -8,6 +8,7 @@ Camera::~Camera() {}
 void Camera::Init(const CU::Vector3f& aPos, const CU::Vector3f& aRot, 
 	const float aFoV, const CU::Vector2f& aRes, const float aNearPlane, const float aFarPlane)
 {
+	aRot;
 	myViewMatrix.SetPositionRelative(aPos);
 	SetPerspectiveProjection(aFoV, aRes, aNearPlane, aFarPlane);
 }

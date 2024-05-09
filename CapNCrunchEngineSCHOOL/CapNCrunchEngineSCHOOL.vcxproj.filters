@@ -1,59 +1,61 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{beb46b33-ec16-4bbe-b230-871f328e4583}</UniqueIdentifier>
+    <Filter Include="CU">
+      <UniqueIdentifier>{3D735900-29FF-870B-92AD-880B7E58880B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GraphicsEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Primitive.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="CU\Input.h">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Matrix3x3.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Matrix4x4.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Quaternion.h">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Random.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Timer.h">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\UtilityFunctions.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Vector2.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Vector3.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="CU\Vector4.hpp">
+      <Filter>CU</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="GraphicsEngine.h" />
+    <ClInclude Include="Primitive.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GraphicsEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Primitive.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="CU\Input.cpp">
+      <Filter>CU</Filter>
+    </ClCompile>
+    <ClCompile Include="CU\Random.cpp">
+      <Filter>CU</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="GraphicsEngine.cpp" />
+    <ClCompile Include="Primitive.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ColorPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="CoolsinwavePS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <FxCompile Include="Color_PS.hlsl" />
+    <FxCompile Include="Color_VS.hlsl" />
+    <FxCompile Include="Coolsinwave_PS.hlsl" />
   </ItemGroup>
 </Project>

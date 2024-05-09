@@ -1,6 +1,4 @@
 #include "Random.hpp"
-#include "pch.h"
-#include "framework.h"
 
 namespace CommonUtilities
 {

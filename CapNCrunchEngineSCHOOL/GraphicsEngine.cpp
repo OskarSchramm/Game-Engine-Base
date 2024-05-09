@@ -24,6 +24,7 @@ GraphicsEngine::~GraphicsEngine() = default;
 
 bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 {
+	aHeight; aWidth;
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferCount = 1;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -32,7 +33,8 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.Windowed = true;
 
-	HRESULT result = D3D11CreateDeviceAndSwapChain(
+	HRESULT result = S_FALSE;
+	result = D3D11CreateDeviceAndSwapChain(
 		nullptr, 
 		D3D_DRIVER_TYPE_HARDWARE, 
 		nullptr, 
@@ -76,8 +78,8 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 	//DepthBuffer
 	ID3D11Texture2D* depthBufferTexture;
 	D3D11_TEXTURE2D_DESC depthBufferDesc = {};
-	depthBufferDesc.Width = width;
-	depthBufferDesc.Height = height;
+	depthBufferDesc.Width = (UINT)width;
+	depthBufferDesc.Height = (UINT)height;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	depthBufferDesc.SampleDesc.Count = 1;
@@ -149,10 +151,16 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 			3, 7, 6, 6, 2, 3
 		};
 
-		myCube->Init(vertices, std::size(vertices), indices, std::size(indices));
-		myCube->SetPosition({0.0f, 0.0f, 0.0f});
-		myCube->SetVertexShader(L"ColorVS");
-		myCube->SetPixelShader(L"ColorPS");
+		if (!myCube->Init(vertices, (UINT)std::size(vertices), indices, (UINT)std::size(indices)))
+			return false;
+
+		if (!myCube->SetVertexShader(L"shaders/Color_VS"))
+			return false;
+
+		if (!myCube->SetPixelShader(L"shaders/Color_PS"))
+			return false;
+
+		myCube->SetPosition({ 0.0f, 0.0f, 0.0f });
 	}
 
 	//ADDED
@@ -181,10 +189,16 @@ bool GraphicsEngine::Init(int aHeight, int aWidth, HWND aWindowHandle)
 			3, 4, 1,
 		};
 
-		myPyramid->Init(vertices, std::size(vertices), indices, std::size(indices));
+		if (!myPyramid->Init(vertices, (UINT)std::size(vertices), indices, (UINT)std::size(indices)))
+			return false;
+
+		if (!myPyramid->SetVertexShader(L"shaders/Color_VS"))
+			return false;
+
+		if (!myPyramid->SetPixelShader(L"shaders/Coolsinwave_PS"))
+			return false;
+
 		myPyramid->SetPosition({ 0.0f, 0.0f, 5.0f });
-		myPyramid->SetVertexShader(L"ColorVS");
-		myPyramid->SetPixelShader(L"CoolsinwavePS");
 	}
 
 	return true;
@@ -213,7 +227,7 @@ void GraphicsEngine::RenderPrimitive(Primitive* aPrimitive)
 		auto worldToClip = CU::Matrix4x4f::GetFastInverse(myCamera.GetViewMatrix()) * myCamera.GetProjectionMatrix();
 
 		frameBufferData.worldToClipMatrix = worldToClip;
-		frameBufferData.totalTime = myTimer.GetTotalTime();
+		frameBufferData.totalTime = (float)myTimer.GetTotalTime();
 
 		myContext->Map(myFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedCBuffer);
 		memcpy(mappedCBuffer.pData, &frameBufferData, sizeof(FrameBuffer));

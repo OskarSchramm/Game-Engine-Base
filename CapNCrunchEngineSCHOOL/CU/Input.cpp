@@ -1,6 +1,4 @@
 #include "Input.h"
-#include "pch.h"
-#include "framework.h"
 
 using namespace CommonUtilities;
 
@@ -61,17 +59,20 @@ int Mouse::GetPosY() const
 
 void Mouse::SetPos(const int aX, const int aY)
 {
-	SetPos(aX, aY);
+	aX; aY;
+	//SetPos(aX, aY);
 }
 
 void Mouse::SetPosX(const int aX)
 {
-	SetPosX(aX);
+	aX;
+	//SetPosX(aX);
 }
 
 void Mouse::SetPosY(const int aY)
 {
-	SetPosY(aY);
+	aY;
+	//SetPosY(aY);
 }
 
 void Mouse::CaptureMouse()
@@ -156,6 +157,7 @@ void Mouse::OnMouseEnter()
 
 void Mouse::OnLeftPressed(const int aX, const int aY)
 {
+	aX; aY;
 	myLeftIsPressed = true;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::LPress, *this));
@@ -164,6 +166,7 @@ void Mouse::OnLeftPressed(const int aX, const int aY)
 
 void Mouse::OnLeftReleased(const int aX, const int aY)
 {
+	aX; aY;
 	myLeftIsPressed = false;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::LRelease, *this));
@@ -172,6 +175,7 @@ void Mouse::OnLeftReleased(const int aX, const int aY)
 
 void Mouse::OnRightPressed(const int aX, const int aY)
 {
+	aX; aY;
 	myRightIsPressed = true;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::RPress, *this));
@@ -180,6 +184,7 @@ void Mouse::OnRightPressed(const int aX, const int aY)
 
 void Mouse::OnRightReleased(const int aX, const int aY)
 {
+	aX; aY;
 	myRightIsPressed = false;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::RRelease, *this));
@@ -188,6 +193,7 @@ void Mouse::OnRightReleased(const int aX, const int aY)
 
 void Mouse::OnMiddlePressed(const int aX, const int aY)
 {
+	aX; aY;
 	myMiddleIsPressed = true;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::MPress, *this));
@@ -196,6 +202,7 @@ void Mouse::OnMiddlePressed(const int aX, const int aY)
 
 void Mouse::OnMiddleReleased(const int aX, const int aY)
 {
+	aX; aY;
 	myMiddleIsPressed = false;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::MRelease, *this));
@@ -204,6 +211,7 @@ void Mouse::OnMiddleReleased(const int aX, const int aY)
 
 void Mouse::OnXOnePressed(const int aX, const int aY)
 {
+	aX; aY;
 	myXOneIsPressed = true;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::XOnePress, *this));
@@ -212,6 +220,7 @@ void Mouse::OnXOnePressed(const int aX, const int aY)
 
 void Mouse::OnXOneReleased(const int aX, const int aY)
 {
+	aX; aY;
 	myXOneIsPressed = false;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::XOneRelease, *this));
@@ -220,6 +229,7 @@ void Mouse::OnXOneReleased(const int aX, const int aY)
 
 void Mouse::OnXTwoPressed(const int aX, const int aY)
 {
+	aX; aY;
 	myXTwoIsPressed = true;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::XTwoPress, *this));
@@ -228,6 +238,7 @@ void Mouse::OnXTwoPressed(const int aX, const int aY)
 
 void Mouse::OnXTwoReleased(const int aX, const int aY)
 {
+	aX; aY;
 	myXTwoIsPressed = false;
 
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::XTwoRelease, *this));
@@ -236,12 +247,14 @@ void Mouse::OnXTwoReleased(const int aX, const int aY)
 
 void Mouse::OnWheelUp(const int aX, const int aY)
 {
+	aX; aY;
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::WheelUp, *this));
 	TrimBuffer();
 }
 
 void Mouse::OnWheelDown(const int aX, const int aY)
 {
+	aX; aY;
 	myBuffer.emplace(Mouse::MouseEvent(Mouse::MouseEvent::MouseType::WheelDown, *this));
 	TrimBuffer();
 }

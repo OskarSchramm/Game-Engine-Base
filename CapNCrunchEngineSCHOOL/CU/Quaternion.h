@@ -18,7 +18,7 @@ namespace CU
 		union
 		{
 			T myValues[4];
-			struct { T w; T x; T y; T z; };
+			struct { T w; T x; T y; T z; } namedStruct;
 		};
 
 		Quaternion<T>();
